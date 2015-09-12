@@ -36,11 +36,12 @@ function_definition
         {
             put_symbol(current_environment, $2);
         }
-      '{' block '}' {
-
+      '{' block '}' 
+        {
             Node* function = new_node();
             function->kind = KIND_FUNC;
             function->body_node = $7;
+            function->symbol = $2;
             $$ = function;
         }
     ;

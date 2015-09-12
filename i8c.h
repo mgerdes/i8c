@@ -13,8 +13,12 @@ typedef struct Node {
     int kind;
     long i_value;
     char* symbol_name;
+
+    struct Node* symbol;
     struct Node* body_node;
+
     struct Node* return_node;
+
     struct Node* left_node;
     struct Node* right_node;
 } Node;

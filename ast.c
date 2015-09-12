@@ -15,7 +15,7 @@ void print_ast_indented(Node* ast, int tabs) {
     if (ast->kind == KIND_INT) {
         printf("INTEGER -> %d\n", ast->i_value);
     } else if (ast->kind == KIND_FUNC) {
-        printf("FUNCTION\n");
+        printf("FUNCTION -> %s\n", ast->symbol->symbol_name);
         print_ast_indented(ast->body_node, tabs + 1);
     } else if (ast->kind == KIND_RETURN) {
         printf("RETURN\n");
