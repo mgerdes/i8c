@@ -29,7 +29,7 @@ void put_symbol(Environment* env, Node* symbol) {
     cur_element->next_element = element;
 }
 
-Node* get_symbol(Environment*env, Node* symbol) {
+Node* get_symbol(Environment* env, Node* symbol) {
     char* symbol_name = symbol->symbol_name;
     Environment_Element* cur_element = env->first_element;     
 
@@ -38,6 +38,10 @@ Node* get_symbol(Environment*env, Node* symbol) {
             return cur_element->symbol;
         } 
         cur_element = cur_element->next_element;
+    }
+
+    if (env->parent_environment) {
+        return get_symbol(env->parent_environment, symbol);
     }
 
     return 0;
