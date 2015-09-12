@@ -2,11 +2,12 @@
 #define YYSTYPE Node*
 #include "i8c.h"
 
+Environment* current_environment;
+
 int yyparse(void);
 int yylex();
-void yyerror(const char *str)
-{
-    fprintf(stderr, "Line %d: %s at \"%s\"\n", yylineno, str, yytext);
+void yyerror(const char *str) {
+    fprintf(stderr, "Line %d: %s \"%s\"\n", yylineno, str, yytext);
 }
 %}
 
@@ -18,6 +19,10 @@ void yyerror(const char *str)
 
 %%
 
+start
+    : { current_environment = new_environment(); } program
+    ;
+
 program
     : function_definition program
         {
@@ -27,10 +32,15 @@ program
     ;
 
 function_definition
-    : INT IDENTIFIER '(' ')' '{' block '}' {
+    : INT IDENTIFIER '(' ')' 
+        {
+            put_symbol(current_environment, $2);
+        }
+      '{' block '}' {
+
             Node* function = new_node();
             function->kind = KIND_FUNC;
-            function->body_node = $6;
+            function->body_node = $7;
             $$ = function;
         }
     ;
@@ -77,6 +87,15 @@ expression
     | NUMBER
         {
             $$ = $1;
+        }
+    | IDENTIFIER
+        {
+            Node* symbol = get_symbol(current_environment, $1);
+            if (!symbol) {
+                yyerror("Could not find symbol");
+                YYABORT;
+            }
+            $$ = symbol;
         }
     ;
 

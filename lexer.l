@@ -28,7 +28,14 @@ A {L}|{D}
 "("         { return '('; }
 ")"         { return ')'; }
 
-{L}{A}*     { return IDENTIFIER; };
+{L}{A}*     { 
+                Node* symbol = new_node();
+                symbol->kind = KIND_SYMBOL;
+                symbol->symbol_name = strdup(yytext);
+                yylval = symbol;
+
+                return IDENTIFIER; 
+            };
 {D}*        { 
                 Node* number = new_node();
                 number->kind = KIND_INT;

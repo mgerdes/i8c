@@ -28,6 +28,8 @@ void print_ast_indented(Node* ast, int tabs) {
         printf("-\n");
         print_ast_indented(ast->left_node, tabs + 1);
         print_ast_indented(ast->right_node, tabs + 1);
+    } else if (ast->kind == KIND_SYMBOL) {
+        printf("SYMBOL -> %s\n", ast->symbol_name);
     } else {
         printf("UNKNOWN KIND - %d\n", ast->kind);
     }
