@@ -21,20 +21,41 @@ void yyerror(const char *str) {
 %%
 
 start
-    : { current_environment = new_environment(); } program
+    :   { 
+            current_environment = new_environment(); 
+        } 
+       program
     ;
 
 program
-    : function_definition program
+    : function_definition 
         {
             print_ast($1);
         }
+      program
+    | INT IDENTIFIER '=' expression ';' 
+        {
+            put_symbol(current_environment, $2);
+            
+            Node* assignment_stmt = new_node();
+            assignment_stmt->kind = KIND_ASSIGNMENT;
+            assignment_stmt->symbol = $2; 
+            assignment_stmt->right_node = $4; 
+            $$ = assignment_stmt;
+
+            print_ast($$);
+        }
+      program
     | 
     ;
 
 function_definition
     : INT IDENTIFIER '(' ')' 
         {
+            Environment* new_env = new_environment();
+            new_env->parent_environment = current_environment;
+            current_environment = new_env;
+
             put_symbol(current_environment, $2);
         }
       '{' block '}' 
@@ -44,6 +65,8 @@ function_definition
             function->body_node = $7;
             function->symbol = $2;
             $$ = function;
+
+            current_environment = current_environment->parent_environment;
         }
     ;
 
