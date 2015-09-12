@@ -1,5 +1,9 @@
 *.swp
+*.tab.c
+*.tab.h
+*.yy.c
 *.s
+i8c
 
 # Object files
 *.o
