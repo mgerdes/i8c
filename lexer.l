@@ -1,5 +1,9 @@
 %{
 #include "parser.tab.c"    
+
+void comment();
+
+void yyerror();
 %}
 
 L [a-zA-Z_]

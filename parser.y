@@ -1,7 +1,8 @@
 %{
-
 int yyparse(void);
+
 int yylex();
+
 void yyerror(const char *str)
 {
 	fprintf(stderr,"error: %s\n",str);
@@ -13,4 +14,13 @@ void yyerror(const char *str)
 
 %%
 
-program:
+program
+    : function_definition program
+    | 
+    ;
+
+function_definition
+    : INT IDENTIFIER '(' ')' '{' RETURN NUMBER ';' '}'
+    ;
+        
+    
