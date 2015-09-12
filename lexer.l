@@ -1,7 +1,6 @@
 %{
+#define YYSTYPE Node*
 #include "parser.tab.c"    
-
-void comment();
 
 void yyerror();
 %}
@@ -17,12 +16,26 @@ A {L}|{D}
 
 "int"       { return INT; }
 "return"    { return RETURN; }
+
+"+"         { return '+'; }
+"-"         { return '-'; }
+"*"         { return '*'; }
+"/"         { return '/'; }
+
 ";"         { return ';'; }
 "{"         { return '{'; }
 "}"         { return '}'; }
 "("         { return '('; }
 ")"         { return ')'; }
+
 {L}{A}*     { return IDENTIFIER; };
-{D}*        { return NUMBER; };
+{D}*        { 
+                Node* number = new_node();
+                number->kind = KIND_INT;
+                number->i_value = atoi(yytext);
+                yylval = number;
+
+                return NUMBER; 
+            };
 
 %%
