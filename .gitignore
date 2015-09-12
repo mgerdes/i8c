@@ -3,6 +3,7 @@
 *.tab.h
 *.yy.c
 *.s
+*.output
 i8c
 
 # Object files
