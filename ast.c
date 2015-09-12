@@ -9,8 +9,13 @@ Node* new_node() {
 
 void print_ast_indented(Node* ast, int tabs) {
     int i;
-    for (i = 0; i < tabs; i++) {
-        printf("  ");
+    if (!ast) {
+        return;
+    }
+    if (ast->kind != KIND_BLOCK) {
+        for (i = 0; i < tabs; i++) {
+            printf("  ");
+        }
     }
     if (ast->kind == KIND_INT) {
         printf("INTEGER -> %d\n", ast->i_value);
@@ -33,6 +38,11 @@ void print_ast_indented(Node* ast, int tabs) {
     } else if (ast->kind == KIND_ASSIGNMENT) {
         printf("ASSIGNMENT -> %s\n", ast->symbol->symbol_name);
         print_ast_indented(ast->right_node, tabs + 1);
+    } else if (ast->kind = KIND_BLOCK) {
+        print_ast_indented(ast->left_node, tabs);
+        if (ast->right_node) {
+            print_ast_indented(ast->right_node, tabs);
+        }
     } else {
         printf("UNKNOWN KIND - %d\n", ast->kind);
     }

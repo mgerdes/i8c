@@ -50,9 +50,16 @@ function_definition
 block
     : statement block
         {
-            $$ = $1;
+            Node* block = new_node();
+            block->kind = KIND_BLOCK;
+            block->left_node = $1;
+            block->right_node = $2;
+            $$ = block;
         }
-    |
+    | 
+        {
+            $$ = 0;
+        }
     ;
 
 statement
