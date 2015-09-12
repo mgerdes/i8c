@@ -13,7 +13,7 @@ void print_ast_indented(Node* ast, int tabs) {
         printf("  ");
     }
     if (ast->kind == KIND_INT) {
-        printf("INTEGER - %d\n", ast->i_value);
+        printf("INTEGER -> %d\n", ast->i_value);
     } else if (ast->kind == KIND_FUNC) {
         printf("FUNCTION\n");
         print_ast_indented(ast->body_node, tabs + 1);
