@@ -14,6 +14,7 @@ void yyerror(const char *str) {
 %token INT RETURN
 %token IDENTIFIER NUMBER
 
+%left '='
 %right '+'
 %right '-'
 
@@ -61,6 +62,16 @@ statement
             return_stmt->kind = KIND_RETURN;
             return_stmt->return_node = $2;
             $$ = return_stmt;
+        }
+    | INT IDENTIFIER '=' expression ';'
+        {
+            put_symbol(current_environment, $2);
+            
+            Node* assignment_stmt = new_node();
+            assignment_stmt->kind = KIND_ASSIGNMENT;
+            assignment_stmt->symbol = $2; 
+            assignment_stmt->right_node = $4; 
+            $$ = assignment_stmt;
         }
     | expression ';' 
         {

@@ -1,5 +1,6 @@
 int main() {
-    return main;
+    int x = 1;
+    return x;
 }
 
 int whadup() {
