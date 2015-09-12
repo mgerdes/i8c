@@ -52,11 +52,11 @@ program
 function_definition
     : INT IDENTIFIER '(' ')' 
         {
+            put_symbol(current_environment, $2);
+
             Environment* new_env = new_environment();
             new_env->parent_environment = current_environment;
             current_environment = new_env;
-
-            put_symbol(current_environment, $2);
         }
       '{' block '}' 
         {
@@ -138,6 +138,20 @@ expression
                 YYABORT;
             }
             $$ = symbol;
+        }
+    | IDENTIFIER '(' ')'
+        {
+            Node* symbol = get_symbol(current_environment, $1); 
+            if (!symbol) {
+                yyerror("Could not find symbol");
+                YYABORT;
+            }
+
+            Node* fn_call = new_node();
+            fn_call->kind = KIND_FUNC_CALL;
+            fn_call->symbol = symbol;
+
+            $$ = fn_call;
         }
     ;
 

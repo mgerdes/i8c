@@ -9,6 +9,7 @@ enum {
     KIND_SYMBOL,
     KIND_ASSIGNMENT,
     KIND_BLOCK,
+    KIND_FUNC_CALL,
 };
 
 typedef struct Node {
