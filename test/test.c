@@ -1,8 +1,6 @@
-int main() {
-    int x = 1;
-    return x;
-}
+int hi = 42;
 
-int whadup() {
-    return 42 - 42 + 12 + 18;
+int main() {
+    int x = hi + 10;
+    return 42;
 }

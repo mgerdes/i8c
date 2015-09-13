@@ -2,7 +2,7 @@
 
 enum {
     KIND_FUNC,
-    KIND_INT,
+    KIND_CONSTANT,
     KIND_RETURN,
     KIND_ADD,
     KIND_SUB,
@@ -12,10 +12,17 @@ enum {
     KIND_FUNC_CALL,
 };
 
+enum {
+    TYPE_INT,
+    TYPE_FLOAT,
+};
+
 typedef struct Node {
     int kind;
     long i_value;
     char* symbol_name;
+
+    struct Type* type;
 
     struct Node* symbol;
     struct Node* body_node;
@@ -25,6 +32,9 @@ typedef struct Node {
     struct Node* left_node;
     struct Node* right_node;
 } Node;
+
+Node* new_node();
+void print_ast(Node* ast);
 
 typedef struct Environment_Element {
     Node* symbol;
@@ -42,5 +52,12 @@ void put_symbol(Environment* env, Node* symbol);
 Node* get_symbol(Environment* env, Node* symbol); 
 void print_environment(Environment* env);
 
-Node* new_node();
-void print_ast(Node* ast);
+typedef struct Type {
+    int kind;
+    int size;
+} Type;
+
+Type* get_type(Node* e);
+
+extern Type *type_int;
+extern Type *type_float;

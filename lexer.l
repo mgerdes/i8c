@@ -39,7 +39,8 @@ A {L}|{D}
             };
 {D}*        { 
                 Node* number = new_node();
-                number->kind = KIND_INT;
+                number->kind = KIND_CONSTANT;
+                number->type = type_int;
                 number->i_value = atoi(yytext);
                 yylval = number;
 

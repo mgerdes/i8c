@@ -17,8 +17,8 @@ void print_ast_indented(Node* ast, int tabs) {
             printf("  ");
         }
     }
-    if (ast->kind == KIND_INT) {
-        printf("INTEGER -> %d\n", ast->i_value);
+    if (ast->kind == KIND_CONSTANT) {
+        printf("CONSTANT -> %d\n", ast->i_value);
     } else if (ast->kind == KIND_FUNC) {
         printf("FUNCTION -> %s\n", ast->symbol->symbol_name);
         print_ast_indented(ast->body_node, tabs + 1);

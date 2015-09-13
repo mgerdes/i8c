@@ -1,0 +1,20 @@
+#include "i8c.h"
+
+Type* type_int = &(Type){ TYPE_INT, 4 };
+Type* type_float = &(Type){ TYPE_FLOAT, 4 };
+
+Type* get_type(Node* e) {
+    if (e->kind == KIND_ADD || e->kind == KIND_SUB) {
+        Type* left_type = get_type(e->left_node);
+        Type* right_type = get_type(e->right_node);
+        if (left_type == type_float || right_type == type_float) {
+            return type_float;
+        } else {
+            return type_int;
+        }
+    } else if (e->kind == KIND_FUNC_CALL) {
+        return e->symbol->type;
+    } else if (e->kind == KIND_SYMBOL || e->kind == KIND_CONSTANT) {
+        return e->type;
+    }
+}

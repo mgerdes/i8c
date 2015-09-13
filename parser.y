@@ -35,6 +35,12 @@ program
       program
     | INT IDENTIFIER '=' expression ';' 
         {
+            $2->type = type_int;
+            
+            if (get_type($4) != type_int) {
+                yyerror("Type Error");
+            } 
+
             put_symbol(current_environment, $2);
             
             Node* assignment_stmt = new_node();
@@ -95,6 +101,12 @@ statement
         }
     | INT IDENTIFIER '=' expression ';'
         {
+            $2->type = type_int;
+            
+            if (get_type($4) != type_int) {
+                yyerror("Type Error");
+            } 
+
             put_symbol(current_environment, $2);
             
             Node* assignment_stmt = new_node();
