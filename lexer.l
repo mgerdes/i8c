@@ -28,6 +28,8 @@ A {L}|{D}
 "}"         { return '}'; }
 "("         { return '('; }
 ")"         { return ')'; }
+"["         { return '['; }
+"]"         { return ']'; }
 
 {L}{A}*     { 
                 Node* symbol = new_node();

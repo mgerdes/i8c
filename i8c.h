@@ -9,12 +9,14 @@ enum {
     KIND_SYMBOL,
     KIND_ASSIGNMENT,
     KIND_BLOCK,
+    KIND_DECLARATION,
     KIND_FUNC_CALL,
 };
 
 enum {
     TYPE_INT,
     TYPE_FLOAT,
+    TYPE_ARRAY,
 };
 
 typedef struct Node {
@@ -55,8 +57,11 @@ void print_environment(Environment* env);
 typedef struct Type {
     int kind;
     int size;
+
+    struct Type* ptr; 
 } Type;
 
+Type* make_array_type(Type* type, int array_size);
 Type* get_type(Node* e);
 
 extern Type *type_int;

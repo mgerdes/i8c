@@ -99,6 +99,16 @@ statement
             return_stmt->return_node = $2;
             $$ = return_stmt;
         }
+    | INT IDENTIFIER '[' NUMBER ']' ';'
+        {
+            $2->type = make_array_type(type_int, $4->i_value);
+            put_symbol(current_environment, $2);
+
+            Node* array_declaration = new_node();
+            array_declaration->kind = KIND_DECLARATION;
+            array_declaration->symbol = $2;
+            $$ = array_declaration; 
+        }
     | INT IDENTIFIER '=' expression ';'
         {
             $2->type = type_int;

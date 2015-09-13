@@ -1,7 +1,16 @@
+#include <stdlib.h>
 #include "i8c.h"
 
 Type* type_int = &(Type){ TYPE_INT, 4 };
 Type* type_float = &(Type){ TYPE_FLOAT, 4 };
+
+Type* make_array_type(Type* type, int array_size) {
+    Type* new_type = malloc(sizeof(Type)); 
+    new_type->kind = TYPE_ARRAY;
+    new_type->ptr = type;
+    new_type->size = array_size * type->size;
+    return new_type;
+}
 
 Type* get_type(Node* e) {
     if (e->kind == KIND_ADD || e->kind == KIND_SUB) {
