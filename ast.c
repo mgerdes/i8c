@@ -45,6 +45,9 @@ void print_ast_indented(Node* ast, int tabs) {
         }
     } else if (ast->kind == KIND_DECLARATION) {
         printf("DECLARATION %s\n", ast->symbol->symbol_name);
+        if (ast->right_node) {
+            print_ast_indented(ast->right_node, tabs + 1);
+        }
     } else if (ast->kind == KIND_FUNC_CALL) {
         printf("FUNCTION_CALL %s\n", ast->symbol->symbol_name);
     }

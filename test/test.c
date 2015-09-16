@@ -1,12 +1,13 @@
 int hi = 42;
+int what;
 
 int plug_one() {
     return 10;
 }
 
 int main() {
-    int array[10];
-    int x = array + 10;
+    int x = 10;
     int y = x + hi + 10;
-    return x + y + plug_one();
+    what = x + y + 100;
+    return what + plug_one();
 }

@@ -33,23 +33,9 @@ program
             print_ast($1);
         }
       program
-    | INT IDENTIFIER '=' expression ';' 
+    | declaration ';'
         {
-            $2->type = type_int;
-            
-            if (get_type($4) != type_int) {
-                yyerror("Type Error");
-            } 
-
-            put_symbol(current_environment, $2);
-            
-            Node* assignment_stmt = new_node();
-            assignment_stmt->kind = KIND_ASSIGNMENT;
-            assignment_stmt->symbol = $2; 
-            assignment_stmt->right_node = $4; 
-            $$ = assignment_stmt;
-
-            print_ast($$);
+            print_ast($1);
         }
       program
     | 
@@ -99,32 +85,11 @@ statement
             return_stmt->return_node = $2;
             $$ = return_stmt;
         }
-    | INT IDENTIFIER '[' NUMBER ']' ';'
+    | declaration ';'
         {
-            $2->type = make_array_type(type_int, $4->i_value);
-            put_symbol(current_environment, $2);
-
-            Node* array_declaration = new_node();
-            array_declaration->kind = KIND_DECLARATION;
-            array_declaration->symbol = $2;
-            $$ = array_declaration; 
+            $$ = $1;
         }
-    | INT IDENTIFIER '=' expression ';'
-        {
-            $2->type = type_int;
-            
-            if (get_type($4) != type_int) {
-                yyerror("Type Error");
-            } 
-
-            put_symbol(current_environment, $2);
-            
-            Node* assignment_stmt = new_node();
-            assignment_stmt->kind = KIND_ASSIGNMENT;
-            assignment_stmt->symbol = $2; 
-            assignment_stmt->right_node = $4; 
-            $$ = assignment_stmt;
-        }
+    | assignment ';'
     | expression ';' 
         {
             $$ = $1;
@@ -174,6 +139,69 @@ expression
             fn_call->symbol = symbol;
 
             $$ = fn_call;
+        }
+    ;
+
+declaration
+    : INT IDENTIFIER '=' expression 
+        {
+            $2->type = type_int;
+            
+            if (get_type($4) != type_int) {
+                yyerror("Type Error");
+            } 
+
+            put_symbol(current_environment, $2);
+            
+            Node* declaration_stmt = new_node();
+            declaration_stmt->kind = KIND_DECLARATION;
+            declaration_stmt->symbol = $2; 
+            declaration_stmt->right_node = $4; 
+            $$ = declaration_stmt;
+        }
+    | INT IDENTIFIER 
+        {
+            $2->type = type_int;
+
+            put_symbol(current_environment, $2);
+            
+            Node* declaration_stmt = new_node();
+            declaration_stmt->kind = KIND_DECLARATION;
+            declaration_stmt->symbol = $2; 
+            declaration_stmt->right_node = 0; 
+            $$ = declaration_stmt;
+        }
+    | INT IDENTIFIER '[' NUMBER ']'
+        {
+            $2->type = make_array_type(type_int, $4->i_value);
+            put_symbol(current_environment, $2);
+
+            Node* array_declaration = new_node();
+            array_declaration->kind = KIND_DECLARATION;
+            array_declaration->symbol = $2;
+            $$ = array_declaration; 
+        }
+    ;
+
+assignment
+    : IDENTIFIER '=' expression 
+        {
+            Node* symbol = get_symbol(current_environment, $1);
+
+            if (!symbol) {
+                yyerror("Could not find symbol");
+                YYABORT;
+            }
+            
+            if (get_type($3) != symbol->type) {
+                yyerror("Type Error");
+            } 
+
+            Node* assignment_stmt = new_node();
+            assignment_stmt->kind = KIND_ASSIGNMENT;
+            assignment_stmt->symbol = symbol; 
+            assignment_stmt->right_node = $3; 
+            $$ = assignment_stmt;
         }
     ;
 
