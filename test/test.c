@@ -8,8 +8,10 @@ int plug_one() {
 int main() {
     float z;
     z = hi + 10;
-    {
-        int x;
+    int x = 10;
+    while (x) {
+        int a;
+        x = a - 1;
     }
     int x = 10;
     int y = x + 10;

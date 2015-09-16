@@ -11,7 +11,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT RETURN
+%token FLOAT INT RETURN WHILE
 %token IDENTIFIER NUMBER
 
 %left '='
@@ -104,6 +104,23 @@ statement
             return_stmt->kind = KIND_RETURN;
             return_stmt->return_node = $2;
             $$ = return_stmt;
+        }
+    | WHILE '(' expression ')' '{' 
+        {
+            Environment* new_env = new_environment();
+            new_env->parent_environment = current_environment;
+            current_environment = new_env;
+        }
+      block '}'
+        {
+            Node* while_loop = new_node();
+            while_loop->kind = KIND_WHILE;
+            while_loop->left_node = $3;
+            while_loop->right_node = $7;
+
+            current_environment = current_environment->parent_environment;
+
+            $$ = while_loop;
         }
     | declaration ';'
         {

@@ -15,6 +15,7 @@ A {L}|{D}
 [ \t\n]+ { /* Ignore whitespace */ }
 
 "int"       { return INT; }
+"while"     { return WHILE; }
 "float"     { return FLOAT; }
 "return"    { return RETURN; }
 
