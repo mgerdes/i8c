@@ -1,4 +1,4 @@
-int hi = 42;
+float hi = 42.2;
 int what;
 
 int plug_one() {
@@ -6,8 +6,10 @@ int plug_one() {
 }
 
 int main() {
+    float z;
+    z = hi + 10;
     int x = 10;
-    int y = x + hi + 10;
+    int y = x + 10;
     what = x + y + 100;
     return what + plug_one();
 }

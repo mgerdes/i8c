@@ -11,7 +11,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token INT RETURN
+%token FLOAT INT RETURN
 %token IDENTIFIER NUMBER
 
 %left '='
@@ -42,7 +42,7 @@ program
     ;
 
 function_definition
-    : INT IDENTIFIER '(' ')' 
+    : type IDENTIFIER '(' ')' 
         {
             put_symbol(current_environment, $2);
 
@@ -143,11 +143,11 @@ expression
     ;
 
 declaration
-    : INT IDENTIFIER '=' expression 
+    : type IDENTIFIER '=' expression 
         {
-            $2->type = type_int;
+            $2->type = $1->type;
             
-            if (get_type($4) != type_int) {
+            if (get_type($4) != $2->type) {
                 yyerror("Type Error");
             } 
 
@@ -159,9 +159,9 @@ declaration
             declaration_stmt->right_node = $4; 
             $$ = declaration_stmt;
         }
-    | INT IDENTIFIER 
+    | type IDENTIFIER 
         {
-            $2->type = type_int;
+            $2->type = $1->type;
 
             put_symbol(current_environment, $2);
             
@@ -171,9 +171,9 @@ declaration
             declaration_stmt->right_node = 0; 
             $$ = declaration_stmt;
         }
-    | INT IDENTIFIER '[' NUMBER ']'
+    | type IDENTIFIER '[' NUMBER ']'
         {
-            $2->type = make_array_type(type_int, $4->i_value);
+            $2->type = make_array_type($1->type, $4->i_value);
             put_symbol(current_environment, $2);
 
             Node* array_declaration = new_node();
@@ -202,6 +202,21 @@ assignment
             assignment_stmt->symbol = symbol; 
             assignment_stmt->right_node = $3; 
             $$ = assignment_stmt;
+        }
+    ;
+
+type
+    : INT
+        {
+            Node* type = new_node();
+            type->type = type_int;
+            $$ = type;
+        }
+    | FLOAT
+        {
+            Node* type = new_node();
+            type->type = type_float;
+            $$ = type;
         }
     ;
 

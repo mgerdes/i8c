@@ -22,6 +22,7 @@ enum {
 typedef struct Node {
     int kind;
     long i_value;
+    double f_value;
     char* symbol_name;
 
     struct Type* type;

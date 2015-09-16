@@ -15,6 +15,7 @@ A {L}|{D}
 [ \t\n]+ { /* Ignore whitespace */ }
 
 "int"       { return INT; }
+"float"     { return FLOAT; }
 "return"    { return RETURN; }
 
 "+"         { return '+'; }
@@ -44,6 +45,15 @@ A {L}|{D}
                 number->kind = KIND_CONSTANT;
                 number->type = type_int;
                 number->i_value = atoi(yytext);
+                yylval = number;
+
+                return NUMBER; 
+            };
+({D}*\.{D}*)|({D}*\.)|(\.{D}*) {
+                Node* number = new_node();
+                number->kind = KIND_CONSTANT;
+                number->type = type_float;
+                number->f_value = atof(yytext);
                 yylval = number;
 
                 return NUMBER; 
