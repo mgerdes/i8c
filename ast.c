@@ -43,10 +43,13 @@ void print_ast_indented(Node* ast, int tabs) {
         printf("ASSIGNMENT %s\n", ast->symbol->symbol_name);
         print_ast_indented(ast->right_node, tabs + 1);
     } else if (ast->kind == KIND_BLOCK) {
-        print_ast_indented(ast->left_node, tabs);
-        if (ast->right_node) {
-            print_ast_indented(ast->right_node, tabs);
+        if (ast->left_node->kind == KIND_BLOCK) {
+            // an inner block should be indented in more as it has a different scope.
+            print_ast_indented(ast->left_node, tabs + 1);
+        } else {
+            print_ast_indented(ast->left_node, tabs);
         }
+        print_ast_indented(ast->right_node, tabs);
     } else if (ast->kind == KIND_DECLARATION) {
         printf("DECLARATION %s\n", ast->symbol->symbol_name);
         if (ast->right_node) {

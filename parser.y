@@ -71,6 +71,26 @@ block
             block->right_node = $2;
             $$ = block;
         }
+    | '{' 
+        {
+            // create new environment for inner block
+            Environment* new_env = new_environment();
+            new_env->parent_environment = current_environment;
+            current_environment = new_env;
+        }
+      block '}' 
+        {
+            // restore old environment on leaving inner block 
+            current_environment = current_environment->parent_environment;
+        }
+      block
+        {
+            Node* block = new_node();
+            block->kind = KIND_BLOCK;
+            block->left_node = $3;
+            block->right_node = $6;
+            $$ = block;
+        }
     | 
         {
             $$ = 0;
