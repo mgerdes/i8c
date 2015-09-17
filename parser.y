@@ -11,7 +11,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT RETURN WHILE
+%token FLOAT INT RETURN WHILE IF ELSE
 %token IDENTIFIER NUMBER
 
 %left '='
@@ -105,7 +105,15 @@ statement
             return_stmt->return_node = $2;
             $$ = return_stmt;
         }
-    | WHILE '(' expression ')' '{' 
+    | while_loop
+    | if_statement 
+    | declaration ';'
+    | assignment ';'
+    | expression ';' 
+    ;
+
+while_loop
+    : WHILE '(' expression ')' '{' 
         {
             Environment* new_env = new_environment();
             new_env->parent_environment = current_environment;
@@ -122,14 +130,25 @@ statement
 
             $$ = while_loop;
         }
-    | declaration ';'
+    ;
+
+if_statement
+    : IF '(' expression ')' '{' 
         {
-            $$ = $1;
+            Environment* new_env = new_environment();
+            new_env->parent_environment = current_environment;
+            current_environment = new_env;
         }
-    | assignment ';'
-    | expression ';' 
+      block '}'
         {
-            $$ = $1;
+            Node* if_statement = new_node();
+            if_statement->kind = KIND_IF;
+            if_statement->left_node = $3;
+            if_statement->right_node = $7;
+            
+            current_environment = current_environment->parent_environment;
+
+            $$ = if_statement;
         }
     ;
 
@@ -151,9 +170,6 @@ expression
             $$ = add_node;
         }
     | NUMBER
-        {
-            $$ = $1;
-        }
     | IDENTIFIER
         {
             Node* symbol = get_symbol(current_environment, $1);

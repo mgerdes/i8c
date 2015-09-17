@@ -46,6 +46,10 @@ void print_ast_indented(Node* ast, int tabs) {
         printf("WHILE\n");
         print_ast_indented(ast->left_node, tabs + 1);
         print_ast_indented(ast->right_node, tabs + 1);
+    } else if (ast->kind == KIND_IF) {
+        printf("IF\n");
+        print_ast_indented(ast->left_node, tabs + 1);
+        print_ast_indented(ast->right_node, tabs + 1);
     } else if (ast->kind == KIND_BLOCK) {
         if (ast->left_node->kind == KIND_BLOCK) {
             // an inner block should be indented in more as it has a different scope.

@@ -9,6 +9,11 @@ int main() {
     float z;
     z = hi + 10;
     int x = 10;
+
+    if (x) {
+        x = 100;
+    }
+
     while (x) {
         int a;
         x = a - 1;

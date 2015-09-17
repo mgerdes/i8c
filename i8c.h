@@ -13,6 +13,7 @@ enum {
     KIND_FUNC_CALL,
     KIND_WHILE,
     KIND_FOR,
+    KIND_IF,
 };
 
 enum {
