@@ -26,6 +26,10 @@ A {L}|{D}
 "*"         { return '*'; }
 "/"         { return '/'; }
 "="         { return '='; }
+">"         { return '>'; }
+">="        { return GTE; }
+"<"         { return '<'; }
+"<="        { return LTE; }
 
 ";"         { return ';'; }
 "{"         { return '{'; }

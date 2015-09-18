@@ -13,10 +13,11 @@ void yyerror(const char *str) {
 
 %token FLOAT INT RETURN WHILE IF ELSE
 %token IDENTIFIER NUMBER
+%token LTE GTE
 
 %left '='
-%right '+'
-%right '-'
+%left '<' '>' LTE GTE
+%right '+' '-'
 
 %%
 
@@ -169,6 +170,7 @@ expression
             add_node->right_node = $3;
             $$ = add_node;
         }
+    | boolean_expression
     | NUMBER
     | IDENTIFIER
         {
@@ -192,6 +194,45 @@ expression
             fn_call->symbol = symbol;
 
             $$ = fn_call;
+        }
+    ;
+
+boolean_expression
+    : expression '>' expression
+        {
+            Node* bin_op = new_node();
+            bin_op->kind = KIND_BIN_OP;
+            bin_op->left_node = $1;
+            bin_op->right_node = $3;
+            bin_op->op = '>';
+            $$ = bin_op;
+        }
+    | expression '<' expression
+        {
+            Node* bin_op = new_node();
+            bin_op->kind = KIND_BIN_OP;
+            bin_op->left_node = $1;
+            bin_op->right_node = $3;
+            bin_op->op = '<';
+            $$ = bin_op;
+        }
+    | expression LTE expression
+        {
+            Node* bin_op = new_node();
+            bin_op->kind = KIND_BIN_OP;
+            bin_op->left_node = $1;
+            bin_op->right_node = $3;
+            bin_op->op = LTE;
+            $$ = bin_op;
+        }
+    | expression GTE expression
+        {
+            Node* bin_op = new_node();
+            bin_op->kind = KIND_BIN_OP;
+            bin_op->left_node = $1;
+            bin_op->right_node = $3;
+            bin_op->op = GTE;
+            $$ = bin_op;
         }
     ;
 

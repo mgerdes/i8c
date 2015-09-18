@@ -10,7 +10,7 @@ int main() {
     z = hi + 10;
     int x = 10;
 
-    if (x) {
+    if (x >= z + 10) {
         x = 100;
     }
 

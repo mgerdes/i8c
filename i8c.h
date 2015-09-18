@@ -14,6 +14,7 @@ enum {
     KIND_WHILE,
     KIND_FOR,
     KIND_IF,
+    KIND_BIN_OP,
 };
 
 enum {
@@ -24,6 +25,7 @@ enum {
 
 typedef struct Node {
     int kind;
+    int op;
     long i_value;
     double f_value;
     char* symbol_name;

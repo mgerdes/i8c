@@ -1,10 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "i8c.h"
+#include "parser.tab.h"
 
 Node* new_node() {
     Node* n = malloc(sizeof(Node)); 
     return n;
+}
+
+void print_binary_operator(int bin_op) {
+    switch(bin_op){
+        case '+':
+        case '-':
+        case '>':
+        case '<':
+            printf("%c", bin_op);
+            break;
+        case LTE:
+            printf("<=");
+            break;
+        case GTE:
+            printf(">=");
+            break;
+        default : 
+            printf("Unknown operator");
+    }
 }
 
 void print_ast_indented(Node* ast, int tabs) {
@@ -48,6 +68,12 @@ void print_ast_indented(Node* ast, int tabs) {
         print_ast_indented(ast->right_node, tabs + 1);
     } else if (ast->kind == KIND_IF) {
         printf("IF\n");
+        print_ast_indented(ast->left_node, tabs + 1);
+        print_ast_indented(ast->right_node, tabs + 1);
+    } else if (ast->kind == KIND_BIN_OP) {
+        printf("BIN OP ");
+        print_binary_operator(ast->op);
+        printf("\n");
         print_ast_indented(ast->left_node, tabs + 1);
         print_ast_indented(ast->right_node, tabs + 1);
     } else if (ast->kind == KIND_BLOCK) {
