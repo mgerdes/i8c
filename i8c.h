@@ -1,5 +1,3 @@
-#define SYMBOL_TABLE_SIZE 20
-
 enum {
     KIND_FUNC,
     KIND_CONSTANT,
