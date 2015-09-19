@@ -22,10 +22,7 @@ void yyerror(const char *str) {
 %%
 
 start
-    :   { 
-            current_environment = new_environment(); 
-        } 
-       program
+    : program
     ;
 
 program
@@ -48,15 +45,8 @@ function_definition
             $2->left_node = $4;
             $2->type = $1->type;
 
-            put_symbol(current_environment, $2);
-
-            Environment* new_env = new_environment();
-            new_env->parent_environment = current_environment;
-            current_environment = new_env;
-
             Node* function_definition_args = $4; 
             while (function_definition_args) {
-                put_symbol(current_environment, function_definition_args); 
                 function_definition_args = function_definition_args->right_node;
             }
         }
@@ -68,8 +58,6 @@ function_definition
             function->body_node = $8;
             function->symbol = $2;
             $$ = function;
-
-            current_environment = current_environment->parent_environment;
         }
     ;
 
@@ -107,24 +95,12 @@ block
             block->right_node = $2;
             $$ = block;
         }
-    | '{' 
-        {
-            // create new environment for inner block
-            Environment* new_env = new_environment();
-            new_env->parent_environment = current_environment;
-            current_environment = new_env;
-        }
-      block '}' 
-        {
-            // restore old environment on leaving inner block 
-            current_environment = current_environment->parent_environment;
-        }
-      block
+    | '{' block '}' block
         {
             Node* block = new_node();
             block->kind = KIND_BLOCK;
-            block->left_node = $3;
-            block->right_node = $6;
+            block->left_node = $2;
+            block->right_node = $4;
             $$ = block;
         }
     | 
@@ -149,41 +125,23 @@ statement
     ;
 
 while_loop
-    : WHILE '(' expression ')' '{' 
-        {
-            Environment* new_env = new_environment();
-            new_env->parent_environment = current_environment;
-            current_environment = new_env;
-        }
-      block '}'
+    : WHILE '(' expression ')' '{' block '}'
         {
             Node* while_loop = new_node();
             while_loop->kind = KIND_WHILE;
             while_loop->left_node = $3;
-            while_loop->right_node = $7;
-
-            current_environment = current_environment->parent_environment;
-
+            while_loop->right_node = $6;
             $$ = while_loop;
         }
     ;
 
 if_statement
-    : IF '(' expression ')' '{' 
-        {
-            Environment* new_env = new_environment();
-            new_env->parent_environment = current_environment;
-            current_environment = new_env;
-        }
-      block '}'
+    : IF '(' expression ')' '{' block '}'
         {
             Node* if_statement = new_node();
             if_statement->kind = KIND_IF;
             if_statement->left_node = $3;
             if_statement->right_node = $7;
-            
-            current_environment = current_environment->parent_environment;
-
             $$ = if_statement;
         }
     ;
@@ -210,37 +168,12 @@ expression
     | boolean_expression
     | NUMBER
     | IDENTIFIER
-        {
-            Node* symbol = get_symbol(current_environment, $1);
-            if (!symbol) {
-                yyerror("Could not find symbol");
-                YYABORT;
-            }
-            $$ = symbol;
-        }
     | IDENTIFIER '(' function_call_args ')'
         {
-            Node* symbol = get_symbol(current_environment, $1); 
-            if (!symbol) {
-                yyerror("Could not find symbol");
-                YYABORT;
-            }
-
-            Node* function_definition_args = symbol->left_node;
-            Node* function_call_args = $3;
-            while (function_definition_args && function_call_args) {
-                function_definition_args = function_definition_args->right_node;
-                function_call_args = function_call_args->right_node;
-            }
-            if (function_call_args || function_definition_args) {
-                yyerror("Wrong number of arguments passed to function");
-                YYABORT;
-            }
-
             Node* fn_call = new_node();
             fn_call->kind = KIND_FUNC_CALL;
-            fn_call->symbol = symbol;
-
+            fn_call->left_node = $3;
+            fn_call->symbol = $1;
             $$ = fn_call;
         }
     ;
@@ -253,7 +186,7 @@ function_call_args
     | expression ',' function_call_args
         {
             Node* function_call_args = new_node();
-            function_call_args->kind = KIND_SYMBOL;
+            function_call_args->kind = KIND_FUNC_CALL_ARGS;
             function_call_args->left_node = $1;
             function_call_args->right_node = $3;
             $$ = function_call_args;
@@ -261,7 +194,7 @@ function_call_args
     | expression
         {
             Node* function_call_args = new_node();
-            function_call_args->kind = KIND_SYMBOL;
+            function_call_args->kind = KIND_FUNC_CALL_ARGS;
             function_call_args->left_node = $1;
             function_call_args->right_node = 0;
             $$ = function_call_args;
@@ -310,15 +243,8 @@ boolean_expression
 declaration
     : type IDENTIFIER '=' expression 
         {
-            Node* symbol = get_symbol(current_environment, $2);
-            if (symbol) {
-                yyerror("Symbol already declared");
-                YYABORT;
-            }
             $2->type = $1->type;
-            
-            put_symbol(current_environment, $2);
-            
+
             Node* declaration_stmt = new_node();
             declaration_stmt->kind = KIND_DECLARATION;
             declaration_stmt->symbol = $2; 
@@ -328,8 +254,6 @@ declaration
     | type IDENTIFIER 
         {
             $2->type = $1->type;
-
-            put_symbol(current_environment, $2);
             
             Node* declaration_stmt = new_node();
             declaration_stmt->kind = KIND_DECLARATION;
@@ -340,7 +264,6 @@ declaration
     | type IDENTIFIER '[' NUMBER ']'
         {
             $2->type = make_array_type($1->type, $4->i_value);
-            put_symbol(current_environment, $2);
 
             Node* array_declaration = new_node();
             array_declaration->kind = KIND_DECLARATION;
@@ -352,16 +275,9 @@ declaration
 assignment
     : IDENTIFIER '=' expression 
         {
-            Node* symbol = get_symbol(current_environment, $1);
-
-            if (!symbol) {
-                yyerror("Could not find symbol");
-                YYABORT;
-            }
-
             Node* assignment_stmt = new_node();
             assignment_stmt->kind = KIND_ASSIGNMENT;
-            assignment_stmt->symbol = symbol; 
+            assignment_stmt->symbol = $1; 
             assignment_stmt->right_node = $3; 
             $$ = assignment_stmt;
         }

@@ -93,6 +93,11 @@ void print_ast_indented(Node* ast, int tabs) {
         }
     } else if (ast->kind == KIND_FUNC_CALL) {
         printf("FUNCTION_CALL %s\n", ast->symbol->symbol_name);
+        Node* function_call_args = ast->left_node;
+        while (function_call_args) {
+            print_ast_indented(function_call_args->left_node, tabs + 1);
+            function_call_args = function_call_args->right_node;
+        }
     }
     else {
         printf("(UNKNOWN KIND %d)\n", ast->kind);

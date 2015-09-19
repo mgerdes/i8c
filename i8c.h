@@ -11,6 +11,7 @@ enum {
     KIND_FOR,
     KIND_IF,
     KIND_BIN_OP,
+    KIND_FUNC_CALL_ARGS,
 };
 
 enum {
