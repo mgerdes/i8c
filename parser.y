@@ -141,7 +141,7 @@ if_statement
             Node* if_statement = new_node();
             if_statement->kind = KIND_IF;
             if_statement->left_node = $3;
-            if_statement->right_node = $7;
+            if_statement->right_node = $6;
             $$ = if_statement;
         }
     ;
