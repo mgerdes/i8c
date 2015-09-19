@@ -5,6 +5,10 @@ int plug_one() {
     return 10;
 }
 
+int fib(int n) {
+    return n; 
+}
+
 int main() {
     float z;
     z = hi + 10;
@@ -27,9 +31,8 @@ int main() {
     int x = 10;
     int y = x + 10;
     what = x + y + 100;
-    return what + plug_one();
-}
 
-float fib(int n, float x) {
-    return n + x; 
+    int nine = fib(100);
+
+    return what + plug_one();
 }

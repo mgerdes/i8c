@@ -213,7 +213,7 @@ expression
             }
             $$ = symbol;
         }
-    | IDENTIFIER '(' ')'
+    | IDENTIFIER '(' function_call_args ')'
         {
             Node* symbol = get_symbol(current_environment, $1); 
             if (!symbol) {
@@ -227,6 +227,12 @@ expression
 
             $$ = fn_call;
         }
+    ;
+
+function_call_args
+    :
+    | expression ',' function_call_args
+    | expression
     ;
 
 boolean_expression
