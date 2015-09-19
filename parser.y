@@ -45,17 +45,19 @@ program
 function_definition
     : type IDENTIFIER '(' function_definition_args ')' 
         {
-            put_symbol(current_environment, $2);
-
-            Environment* new_env = new_environment();
-            new_env->parent_environment = current_environment;
-            current_environment = new_env;
-
             Node* function_definition_args = $4; 
             while (function_definition_args) {
                 put_symbol(current_environment, function_definition_args); 
                 function_definition_args = function_definition_args->right_node;
             }
+            $2->left_node = $4;
+            $2->type = $1->type;
+
+            put_symbol(current_environment, $2);
+
+            Environment* new_env = new_environment();
+            new_env->parent_environment = current_environment;
+            current_environment = new_env;
         }
       '{' block '}' 
         {
@@ -221,6 +223,16 @@ expression
                 YYABORT;
             }
 
+            Node* function_definition_args = symbol->left_node;
+            Node* function_call_args = $3;
+            while (function_definition_args && function_call_args) {
+                function_definition_args = function_definition_args->right_node;
+                function_call_args = function_call_args->right_node;
+            }
+            if (function_call_args || function_definition_args) {
+                yyerror("Wrong number of arguments passed to function");
+            }
+
             Node* fn_call = new_node();
             fn_call->kind = KIND_FUNC_CALL;
             fn_call->symbol = symbol;
@@ -230,9 +242,26 @@ expression
     ;
 
 function_call_args
-    :
+    :   
+        {
+            $$ = 0;
+        }
     | expression ',' function_call_args
+        {
+            Node* function_call_args = new_node();
+            function_call_args->kind = KIND_SYMBOL;
+            function_call_args->left_node = $1;
+            function_call_args->right_node = $3;
+            $$ = function_call_args;
+        }
     | expression
+        {
+            Node* function_call_args = new_node();
+            function_call_args->kind = KIND_SYMBOL;
+            function_call_args->left_node = $1;
+            function_call_args->right_node = 0;
+            $$ = function_call_args;
+        }
     ;
 
 boolean_expression

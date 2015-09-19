@@ -5,7 +5,7 @@ int plug_one() {
     return 10;
 }
 
-int fib(int n) {
+int fib(int n, int x) {
     return n; 
 }
 
@@ -32,7 +32,8 @@ int main() {
     int y = x + 10;
     what = x + y + 100;
 
-    int nine = fib(100);
+
+    int nine = fib(100, 100);
 
     return what + plug_one();
 }
