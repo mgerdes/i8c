@@ -279,10 +279,6 @@ declaration
         {
             $2->type = $1->type;
             
-            if (get_type($4) != $2->type) {
-                yyerror("Type Error");
-            } 
-
             put_symbol(current_environment, $2);
             
             Node* declaration_stmt = new_node();
@@ -324,10 +320,6 @@ assignment
                 yyerror("Could not find symbol");
                 YYABORT;
             }
-            
-            if (get_type($3) != symbol->type) {
-                yyerror("Type Error");
-            } 
 
             Node* assignment_stmt = new_node();
             assignment_stmt->kind = KIND_ASSIGNMENT;
