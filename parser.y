@@ -45,11 +45,6 @@ program
 function_definition
     : type IDENTIFIER '(' function_definition_args ')' 
         {
-            Node* function_definition_args = $4; 
-            while (function_definition_args) {
-                put_symbol(current_environment, function_definition_args); 
-                function_definition_args = function_definition_args->right_node;
-            }
             $2->left_node = $4;
             $2->type = $1->type;
 
@@ -58,6 +53,12 @@ function_definition
             Environment* new_env = new_environment();
             new_env->parent_environment = current_environment;
             current_environment = new_env;
+
+            Node* function_definition_args = $4; 
+            while (function_definition_args) {
+                put_symbol(current_environment, function_definition_args); 
+                function_definition_args = function_definition_args->right_node;
+            }
         }
       '{' block '}' 
         {
@@ -309,6 +310,11 @@ boolean_expression
 declaration
     : type IDENTIFIER '=' expression 
         {
+            Node* symbol = get_symbol(current_environment, $2);
+            if (symbol) {
+                yyerror("Symbol already declared");
+                YYABORT;
+            }
             $2->type = $1->type;
             
             put_symbol(current_environment, $2);

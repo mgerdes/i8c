@@ -12,9 +12,9 @@ int fib(int n, int x) {
 int main() {
     float z;
     z = hi + 10;
-    int x = 10;
 
     int i = 0;
+    int x = 10;
 
     while (i < 10) {
         i = i + 1;
@@ -28,7 +28,6 @@ int main() {
         int a;
         x = a - 1;
     }
-    int x = 10;
     int y = x + 10;
     what = x + y + 100;
 
