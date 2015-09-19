@@ -13,7 +13,7 @@ Type* make_array_type(Type* type, int array_size) {
 }
 
 Type* get_type(Node* e) {
-    if (e->kind == KIND_ADD || e->kind == KIND_SUB) {
+    if (e->kind == KIND_BIN_OP) {
         Type* left_type = get_type(e->left_node);
         Type* right_type = get_type(e->right_node);
         if (left_type == type_float || right_type == type_float) {

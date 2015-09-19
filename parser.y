@@ -191,18 +191,20 @@ expression
     : expression '+' expression
         {
             Node* add_node = new_node();
-            add_node->kind = KIND_ADD;
+            add_node->kind = KIND_BIN_OP;
+            add_node->op = '+';
             add_node->left_node = $1;
             add_node->right_node = $3;
             $$ = add_node;
         }
     | expression '-' expression
         {
-            Node* add_node = new_node();
-            add_node->kind = KIND_SUB;
-            add_node->left_node = $1;
-            add_node->right_node = $3;
-            $$ = add_node;
+            Node* sub_node = new_node();
+            sub_node->kind = KIND_BIN_OP;
+            sub_node->op = '-';
+            sub_node->left_node = $1;
+            sub_node->right_node = $3;
+            $$ = sub_node;
         }
     | boolean_expression
     | NUMBER

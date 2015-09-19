@@ -2,8 +2,6 @@ enum {
     KIND_FUNC,
     KIND_CONSTANT,
     KIND_RETURN,
-    KIND_ADD,
-    KIND_SUB,
     KIND_SYMBOL,
     KIND_ASSIGNMENT,
     KIND_BLOCK,
