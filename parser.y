@@ -231,6 +231,7 @@ expression
             }
             if (function_call_args || function_definition_args) {
                 yyerror("Wrong number of arguments passed to function");
+                YYABORT;
             }
 
             Node* fn_call = new_node();
