@@ -44,7 +44,16 @@ void print_ast_indented(Node* ast, int tabs) {
             printf("CONSTANT %d\n", ast->i_value);
         }
     } else if (ast->kind == KIND_FUNC) {
-        printf("FUNCTION %s\n", ast->symbol->symbol_name);
+        printf("FUNCTION %s (", ast->symbol->symbol_name);
+        Node* function_definition_args = ast->left_node;
+        while (function_definition_args) {
+            printf("%s", function_definition_args->symbol_name);
+            function_definition_args = function_definition_args->right_node;
+            if (function_definition_args) {
+                printf(", ");
+            }
+        }
+        printf(")\n");
         print_ast_indented(ast->body_node, tabs + 1);
     } else if (ast->kind == KIND_RETURN) {
         printf("RETURN\n");

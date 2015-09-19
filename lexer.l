@@ -32,6 +32,7 @@ A {L}|{D}
 "<="        { return LTE; }
 
 ";"         { return ';'; }
+","         { return ','; }
 "{"         { return '{'; }
 "}"         { return '}'; }
 "("         { return '('; }

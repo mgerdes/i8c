@@ -10,6 +10,12 @@ int main() {
     z = hi + 10;
     int x = 10;
 
+    int i = 0;
+
+    while (i < 10) {
+        i = i + 1;
+    }
+
     if (x >= z + 10) {
         x = 100;
     }
@@ -22,4 +28,8 @@ int main() {
     int y = x + 10;
     what = x + y + 100;
     return what + plug_one();
+}
+
+float fib(int n, float x) {
+    return n + x; 
 }

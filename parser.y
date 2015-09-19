@@ -43,23 +43,55 @@ program
     ;
 
 function_definition
-    : type IDENTIFIER '(' ')' 
+    : type IDENTIFIER '(' function_definition_args ')' 
         {
             put_symbol(current_environment, $2);
 
             Environment* new_env = new_environment();
             new_env->parent_environment = current_environment;
             current_environment = new_env;
+
+            Node* function_definition_args = $4; 
+            while (function_definition_args) {
+                put_symbol(current_environment, function_definition_args); 
+                function_definition_args = function_definition_args->right_node;
+            }
         }
       '{' block '}' 
         {
             Node* function = new_node();
             function->kind = KIND_FUNC;
-            function->body_node = $7;
+            function->left_node = $4;
+            function->body_node = $8;
             function->symbol = $2;
             $$ = function;
 
             current_environment = current_environment->parent_environment;
+        }
+    ;
+
+function_definition_args
+    :  
+        {
+            $$ = 0;
+        }
+    | type IDENTIFIER
+        {
+            Node* function_definition_args = new_node();
+            function_definition_args->kind = KIND_SYMBOL;
+            function_definition_args->type = $1->type; 
+            function_definition_args->symbol_name = $2->symbol_name;
+            function_definition_args->right_node = 0;
+            $$ = function_definition_args;
+        }
+    | type IDENTIFIER ',' function_definition_args
+        {
+            Node* function_definition_args = new_node();
+            function_definition_args->kind = KIND_SYMBOL;
+            function_definition_args->type = $1->type; 
+            function_definition_args->symbol_name = $2->symbol_name;
+            function_definition_args->right_node = $4;
+            $$ = function_definition_args;
         }
     ;
 
