@@ -31,9 +31,6 @@ int main() {
     int y = x + 10;
     what = x + y + 100;
 
-
-    int nine = fib(100, 100);
-
     return what + plug_one();
 }
 

@@ -24,9 +24,8 @@ void yyerror(const char *str) {
 start
     : program
         {
-            print_ast($1);
-            gen_code($1);
             push_new_environment();
+            gen_code($1);
         }
     ;
 
