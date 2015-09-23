@@ -72,3 +72,5 @@ Type* get_type(Node* e);
 
 extern Type *type_int;
 extern Type *type_float;
+
+void gen_code(Node* ast); 
