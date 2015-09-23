@@ -91,6 +91,9 @@ void print_ast_indented(Node* ast, int tabs) {
         if (ast->right_node) {
             print_ast_indented(ast->right_node, tabs + 1);
         }
+    } else if (ast->kind == KIND_PROGRAM) {
+        print_ast_indented(ast->left_node, tabs);
+        print_ast_indented(ast->right_node, tabs);
     } else if (ast->kind == KIND_FUNC_CALL) {
         printf("FUNCTION_CALL %s\n", ast->symbol->symbol_name);
         Node* function_call_args = ast->left_node;

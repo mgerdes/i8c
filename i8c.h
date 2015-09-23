@@ -12,6 +12,7 @@ enum {
     KIND_IF,
     KIND_BIN_OP,
     KIND_FUNC_CALL_ARGS,
+    KIND_PROGRAM,
 };
 
 enum {
@@ -52,9 +53,11 @@ typedef struct Environment {
     Environment_Element* first_element;
 } Environment;
 
-Environment* new_environment();
 void put_symbol(Environment* env, Node* symbol); 
 Node* get_symbol(Environment* env, Node* symbol); 
+void push_new_environment();
+void pop_environment();
+Environment* top_environment();
 void print_environment(Environment* env);
 
 typedef struct Type {

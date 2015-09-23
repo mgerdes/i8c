@@ -21,11 +21,11 @@ int main() {
     }
 
     if (x >= z + 10) {
-        x = 100;
+        x = 100 + 100;
     }
 
-    while (x) {
-        int a;
+    while (x >= 10) {
+        int a = 1;
         x = a - 1;
     }
     int y = x + 10;
@@ -35,4 +35,8 @@ int main() {
     int nine = fib(100, 100);
 
     return what + plug_one();
+}
+
+int hello() {
+    return 90.9;
 }

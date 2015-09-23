@@ -23,20 +23,32 @@ void yyerror(const char *str) {
 
 start
     : program
+        {
+            print_ast($1);
+        }
     ;
 
 program
-    : function_definition 
+    : function_definition program
         {
-            print_ast($1);
+            Node* program = new_node();
+            program->left_node = $1;
+            program->right_node = $2;
+            program->kind = KIND_PROGRAM;
+            $$ = program;
         }
-      program
-    | declaration ';'
+    | declaration ';' program
         {
-            print_ast($1);
+            Node* program = new_node();
+            program->left_node = $1;
+            program->right_node = $3;
+            program->kind = KIND_PROGRAM;
+            $$ = program;
         }
-      program
-    | 
+    |  
+        {
+            $$ = 0;
+        }
     ;
 
 function_definition

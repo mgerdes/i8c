@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "i8c.h"
 
+Environment* cur_environment;
+
 Environment* new_environment() {
     Environment* new_environment = malloc(sizeof(Environment));
     return new_environment;
@@ -11,6 +13,20 @@ Environment* new_environment() {
 Environment_Element* new_element() {
     Environment_Element* element = malloc(sizeof(Environment_Element));
     return element;
+}
+
+void push_new_environment() {
+    Environment* env = new_environment();
+    env->parent_environment = cur_environment;
+    cur_environment = env;
+}
+
+void pop_environment() {
+    cur_environment = cur_environment->parent_environment;     
+}
+
+Environment* top_environment() {
+    return cur_environment;
 }
 
 void put_symbol(Environment* env, Node* symbol) {
