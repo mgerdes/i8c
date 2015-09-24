@@ -14,7 +14,7 @@ int main() {
     z = hi + 10;
 
     int i = 0;
-    int x = 10;
+    int x = 10 + asdf();
 
     while (i < 10) {
         i = i + 1;

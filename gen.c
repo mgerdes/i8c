@@ -55,6 +55,7 @@ void gen_code(Node* ast) {
         gen_code(ast->right_node);
     } else if (ast->kind == KIND_DECLARATION) {
         put_symbol(top_environment(), ast->symbol);
+        gen_code(ast->right_node);
     } else if (ast->kind == KIND_PROGRAM) {
         gen_code(ast->left_node);
         gen_code(ast->right_node);
