@@ -14,6 +14,8 @@ int main(int argc, char* argv[]) {
 
     yyparse();
 
+    print_ast(program);
+
     write_header();
     // push the global environment
     push_new_environment();

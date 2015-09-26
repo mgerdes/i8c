@@ -12,8 +12,9 @@ void write_footer() {
 
 void gen_code_bin_op(Node* ast) {
     gen_code(ast->left_node);
-    printf("mov %rbx, %rax\n");
+    printf("push %rax\n");
     gen_code(ast->right_node);
+    printf("pop %rbx\n");
     if (ast->op == '+') {
         printf("add %rax, %rbx\n");
     }
@@ -21,6 +22,28 @@ void gen_code_bin_op(Node* ast) {
 
 void gen_code_constant(Node* ast) {
     printf("mov %rax, %d\n", ast->i_value);
+}
+
+void gen_code_assignment(Node* ast) {
+    Node* symbol = get_symbol(top_environment(), ast->symbol);
+    if (!symbol) {
+        printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol->symbol_name);
+    }
+    gen_code(ast->right_node);
+}
+
+void gen_code_symbol(Node* ast) {
+    Node* symbol = get_symbol(top_environment(), ast);
+    if (!symbol) {
+        printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol_name);
+    }
+    printf("mov %rax, -%d(%rsp)\n", symbol->offset);
+}
+
+void gen_code_declaration(Node* ast) {
+    put_symbol(top_environment(), ast->symbol);
+    gen_code(ast->right_node);
+    printf("mov -%d(%rsp), %rax\n", ast->symbol->offset);
 }
 
 void gen_code(Node* ast) {
@@ -46,16 +69,9 @@ void gen_code(Node* ast) {
     } else if (ast->kind == KIND_RETURN) {
         gen_code(ast->return_node);
     } else if (ast->kind == KIND_SYMBOL) {
-        Node* symbol = get_symbol(top_environment(), ast);
-        if (!symbol) {
-            printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol_name);
-        }
+        gen_code_symbol(ast);
     } else if (ast->kind == KIND_ASSIGNMENT) {
-        Node* symbol = get_symbol(top_environment(), ast->symbol);
-        if (!symbol) {
-            printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol->symbol_name);
-        }
-        gen_code(ast->right_node);
+        gen_code_assignment(ast);
     } else if (ast->kind == KIND_WHILE) {
         gen_code(ast->left_node);
         gen_code(ast->right_node);
@@ -75,8 +91,7 @@ void gen_code(Node* ast) {
         }
         gen_code(ast->right_node);
     } else if (ast->kind == KIND_DECLARATION) {
-        put_symbol(top_environment(), ast->symbol);
-        gen_code(ast->right_node);
+        gen_code_declaration(ast);
     } else if (ast->kind == KIND_PROGRAM) {
         gen_code(ast->left_node);
         gen_code(ast->right_node);
