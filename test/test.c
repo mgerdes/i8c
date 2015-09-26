@@ -1,4 +1,6 @@
 int main() {
-    int x = 5;
-    int y = 5 + x + x; 
+    int a, b, c, x, y;
+    x = 5;
+    a = 10;
+    y = 5 + a + x * 5; 
 }

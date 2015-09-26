@@ -253,24 +253,13 @@ boolean_expression
     ;
 
 declaration
-    : type IDENTIFIER '=' expression 
-        {
-            $2->type = $1->type;
-
-            Node* declaration_stmt = new_node();
-            declaration_stmt->kind = KIND_DECLARATION;
-            declaration_stmt->symbol = $2; 
-            declaration_stmt->right_node = $4; 
-            $$ = declaration_stmt;
-        }
-    | type IDENTIFIER 
+    : type list_of_identifiers 
         {
             $2->type = $1->type;
             
             Node* declaration_stmt = new_node();
             declaration_stmt->kind = KIND_DECLARATION;
-            declaration_stmt->symbol = $2; 
-            declaration_stmt->right_node = 0; 
+            declaration_stmt->right_node = $2; 
             $$ = declaration_stmt;
         }
     | type IDENTIFIER '[' NUMBER ']'
@@ -283,6 +272,24 @@ declaration
             $$ = array_declaration; 
         }
     ;
+
+list_of_identifiers
+    : IDENTIFIER
+        {
+            Node* identifier_list = new_node();
+            identifier_list->kind = KIND_IDENTIFIER_LIST;
+            identifier_list->symbol = $1;
+            identifier_list->right_node = 0;
+            $$ = identifier_list;
+        }
+    | IDENTIFIER ',' list_of_identifiers
+        {
+            Node* identifier_list = new_node();
+            identifier_list->kind = KIND_IDENTIFIER_LIST;
+            identifier_list->symbol = $1;
+            identifier_list->right_node = $3;
+            $$ = identifier_list;
+        }
 
 assignment
     : IDENTIFIER '=' expression 

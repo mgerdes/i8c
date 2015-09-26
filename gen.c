@@ -41,9 +41,11 @@ void gen_code_symbol(Node* ast) {
 }
 
 void gen_code_declaration(Node* ast) {
-    put_symbol(top_environment(), ast->symbol);
-    gen_code(ast->right_node);
-    printf("mov -%d(%rsp), %rax\n", ast->symbol->offset);
+    Node* cur_declaration = ast->right_node;
+    while (cur_declaration) {
+        put_symbol(top_environment(), cur_declaration->symbol);
+        cur_declaration = cur_declaration->right_node;
+    }
 }
 
 void gen_code(Node* ast) {

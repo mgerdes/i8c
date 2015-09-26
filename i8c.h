@@ -13,6 +13,7 @@ enum {
     KIND_BIN_OP,
     KIND_FUNC_CALL_ARGS,
     KIND_PROGRAM,
+    KIND_IDENTIFIER_LIST,
 };
 
 enum {

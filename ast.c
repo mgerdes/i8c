@@ -87,10 +87,16 @@ void print_ast_indented(Node* ast, int tabs) {
         }
         print_ast_indented(ast->right_node, tabs);
     } else if (ast->kind == KIND_DECLARATION) {
-        printf("DECLARATION %s\n", ast->symbol->symbol_name);
-        if (ast->right_node) {
-            print_ast_indented(ast->right_node, tabs + 1);
+        Node* cur_declaration = ast->right_node;
+        printf("DECLARATION ");
+        while (cur_declaration) {
+            printf("%s", cur_declaration->symbol->symbol_name);
+            cur_declaration = cur_declaration->right_node;
+            if (cur_declaration) {
+                printf(", ");
+            }
         }
+        printf("\n");
     } else if (ast->kind == KIND_PROGRAM) {
         print_ast_indented(ast->left_node, tabs);
         print_ast_indented(ast->right_node, tabs);
