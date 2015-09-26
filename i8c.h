@@ -39,6 +39,7 @@ typedef struct Node {
     struct Node* right_node;
 } Node;
 
+Node* program;
 Node* new_node();
 void print_ast(Node* ast);
 
@@ -73,4 +74,6 @@ Type* get_type(Node* e);
 extern Type *type_int;
 extern Type *type_float;
 
+void write_header();
+void write_footer();
 void gen_code(Node* ast); 

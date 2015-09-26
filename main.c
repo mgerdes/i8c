@@ -5,7 +5,7 @@
 extern FILE *yyin;
 
 int main(int argc, char* argv[]) {
-    char *file_name;
+    char* file_name;
     
     if (argc > 1) {
         file_name = argv[1];
@@ -13,4 +13,10 @@ int main(int argc, char* argv[]) {
     }
 
     yyparse();
+
+    write_header();
+    // push the global environment
+    push_new_environment();
+    gen_code(program);
+    write_footer();
 }

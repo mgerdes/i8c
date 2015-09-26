@@ -2,12 +2,34 @@
 #include <stdlib.h>
 #include "i8c.h"
 
+void write_header() {
+
+}
+
+void write_footer() {
+
+}
+
+void gen_code_bin_op(Node* ast) {
+    gen_code(ast->left_node);
+    printf("mov %rbx, %rax\n");
+    gen_code(ast->right_node);
+    if (ast->op == '+') {
+        printf("add %rax, %rbx\n");
+    }
+}
+
+void gen_code_constant(Node* ast) {
+    printf("mov %rax, %d\n", ast->i_value);
+}
+
 void gen_code(Node* ast) {
     if (!ast) {
         return;
     }
 
     if (ast->kind == KIND_CONSTANT) {
+        gen_code_constant(ast);
     } else if (ast->kind == KIND_FUNC) {
         put_symbol(top_environment(), ast->symbol);
 
@@ -41,8 +63,7 @@ void gen_code(Node* ast) {
         gen_code(ast->left_node);
         gen_code(ast->right_node);
     } else if (ast->kind == KIND_BIN_OP) {
-        gen_code(ast->left_node);
-        gen_code(ast->right_node);
+        gen_code_bin_op(ast);
     } else if (ast->kind == KIND_BLOCK) {
         if (ast->left_node->kind == KIND_BLOCK) {
             // this is an inner block, needs new environment
