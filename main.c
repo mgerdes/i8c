@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
 
     print_ast(program);
 
+    printf("-----------------------\n");
+
     write_header();
     // push the global environment
     push_new_environment();

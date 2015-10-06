@@ -12,16 +12,16 @@ void write_footer() {
 
 void gen_code_bin_op(Node* ast) {
     gen_code(ast->left_node);
-    printf("push %rax\n");
+    printf("\tpush\t%%eax\n");
     gen_code(ast->right_node);
-    printf("pop %rbx\n");
+    printf("\tpop\t%%ebx\n");
     if (ast->op == '+') {
-        printf("add %rax, %rbx\n");
+        printf("\tadd\t%%ebx, %%eax\n");
     }
 }
 
 void gen_code_constant(Node* ast) {
-    printf("mov %rax, %d\n", ast->i_value);
+    printf("\tmov\t$%d, %%eax\n", ast->i_value);
 }
 
 void gen_code_assignment(Node* ast) {
@@ -30,6 +30,7 @@ void gen_code_assignment(Node* ast) {
         printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol->symbol_name);
     }
     gen_code(ast->right_node);
+    printf("\tmov\t%%eax, -%d(%%ebp)\n", symbol->offset);
 }
 
 void gen_code_symbol(Node* ast) {
@@ -37,7 +38,7 @@ void gen_code_symbol(Node* ast) {
     if (!symbol) {
         printf("WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol_name);
     }
-    printf("mov %rax, -%d(%rsp)\n", symbol->offset);
+    printf("\tmov\t-%d(%%ebp), %%eax\n", symbol->offset);
 }
 
 void gen_code_declaration(Node* ast) {
@@ -46,6 +47,15 @@ void gen_code_declaration(Node* ast) {
         put_symbol(top_environment(), cur_declaration->symbol);
         cur_declaration = cur_declaration->right_node;
     }
+}
+
+void gen_code_function_definition(Node* ast) {
+    printf("%s:\n", ast->symbol->symbol_name);
+    printf("\tpush\t%%ebp\n");
+    printf("\tmov\t%%esp, %%ebp\n");
+    gen_code(ast->body_node);
+    printf("\tleave\n");
+    printf("\tret\n");
 }
 
 void gen_code(Node* ast) {
@@ -66,7 +76,7 @@ void gen_code(Node* ast) {
             function_definition_args = function_definition_args->right_node;
         }
 
-        gen_code(ast->body_node);
+        gen_code_function_definition(ast);
         pop_environment();
     } else if (ast->kind == KIND_RETURN) {
         gen_code(ast->return_node);
