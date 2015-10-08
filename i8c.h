@@ -14,12 +14,15 @@ enum {
     KIND_FUNC_CALL_ARGS,
     KIND_PROGRAM,
     KIND_IDENTIFIER_LIST,
+    KIND_STRING,
+    KIND_FUNC_DEF
 };
 
 enum {
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_ARRAY,
+    TYPE_VOID,
 };
 
 typedef struct Node {
@@ -28,6 +31,7 @@ typedef struct Node {
     int offset;
     long i_value;
     double f_value;
+    char* s_value;
     char* symbol_name;
 
     struct Type* type;
@@ -75,7 +79,9 @@ Type* get_type(Node* e);
 
 extern Type *type_int;
 extern Type *type_float;
+extern Type *type_void;
 
+void init_code_gen(char*);
 void write_header();
 void write_footer();
 void gen_code(Node* ast); 

@@ -11,8 +11,8 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT RETURN WHILE IF ELSE
-%token IDENTIFIER NUMBER
+%token FLOAT INT VOID RETURN WHILE IF ELSE
+%token IDENTIFIER NUMBER STRING
 %token LTE GTE
 
 %left '='
@@ -70,6 +70,16 @@ function_definition
             function->body_node = $8;
             function->symbol = $2;
             $$ = function;
+        }
+    | type IDENTIFIER '(' function_definition_args ')' ';'
+        {
+            $2->left_node = $4;
+            $2->type = $1->type;
+
+            Node* function_def = new_node();
+            function_def->kind = KIND_FUNC_DEF;
+            function_def->symbol = $2;
+            $$ = function_def;
         }
     ;
 
@@ -179,6 +189,7 @@ expression
         }
     | boolean_expression
     | NUMBER
+    | STRING
     | IDENTIFIER
     | IDENTIFIER '(' function_call_args ')'
         {
@@ -255,7 +266,13 @@ boolean_expression
 declaration
     : type list_of_identifiers 
         {
-            $2->type = $1->type;
+            Node* current_declaration = $2;
+
+            // give each identifier the correct type
+            while (current_declaration) {
+                current_declaration->type = $1->type;
+                current_declaration = current_declaration->right_node;
+            }
             
             Node* declaration_stmt = new_node();
             declaration_stmt->kind = KIND_DECLARATION;
@@ -313,6 +330,12 @@ type
         {
             Node* type = new_node();
             type->type = type_float;
+            $$ = type;
+        }
+    | VOID
+        {
+            Node* type = new_node();
+            type->type = type_void;
             $$ = type;
         }
     ;

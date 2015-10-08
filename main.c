@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "parser.tab.h"
 #include "i8c.h"
 
@@ -18,6 +19,10 @@ int main(int argc, char* argv[]) {
 
     printf("-----------------------\n");
 
+    *(file_name + strlen(file_name) - 1) = 's';
+    printf("%s\n", file_name);
+    
+    init_code_gen(file_name);
     write_header();
     // push the global environment
     push_new_environment();

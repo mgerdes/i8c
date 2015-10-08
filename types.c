@@ -3,6 +3,7 @@
 
 Type* type_int = &(Type){ TYPE_INT, 4 };
 Type* type_float = &(Type){ TYPE_FLOAT, 4 };
+Type* type_void = &(Type){ TYPE_VOID, 4 };
 
 Type* make_array_type(Type* type, int array_size) {
     Type* new_type = malloc(sizeof(Type)); 

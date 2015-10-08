@@ -17,6 +17,7 @@ A {L}|{D}
 "if"        { return IF; }
 "else"      { return ELSE; }
 "int"       { return INT; }
+"void"      { return VOID; }
 "while"     { return WHILE; }
 "float"     { return FLOAT; }
 "return"    { return RETURN; }
@@ -39,6 +40,16 @@ A {L}|{D}
 ")"         { return ')'; }
 "["         { return '['; }
 "]"         { return ']'; }
+
+
+\"(\\.|[^"])*\" {
+                    Node* string = new_node();
+                    string->kind = KIND_STRING;
+                    string->s_value = strdup(yytext);
+                    yylval = string;
+
+                    return STRING;
+                };
 
 {L}{A}*     { 
                 Node* symbol = new_node();

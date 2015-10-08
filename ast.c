@@ -43,6 +43,8 @@ void print_ast_indented(Node* ast, int tabs) {
         } else if (ast->type == type_int) {
             printf("CONSTANT %d\n", ast->i_value);
         }
+    } else if (ast->kind == KIND_STRING) {
+        printf("STRING %s\n", ast->s_value);
     } else if (ast->kind == KIND_FUNC) {
         printf("FUNCTION %s (", ast->symbol->symbol_name);
         Node* function_definition_args = ast->left_node;
@@ -107,8 +109,9 @@ void print_ast_indented(Node* ast, int tabs) {
             print_ast_indented(function_call_args->left_node, tabs + 1);
             function_call_args = function_call_args->right_node;
         }
-    }
-    else {
+    } else if (ast->kind == KIND_FUNC_DEF) {
+        printf("FUNCTION_DEF %s\n", ast->symbol->symbol_name);
+    } else {
         printf("(UNKNOWN KIND %d)\n", ast->kind);
     }
 }

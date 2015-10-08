@@ -1,6 +1,8 @@
+void printf();
 int main() {
-    int a, x, y;
-    x = 5;
-    a = 10;
-    y = 5 + a + x; 
+    int a,b,c;
+    a = 5;
+    b = 123;
+    c = 15 + a + b;
+    printf("C is : %d\n", c);
 }
