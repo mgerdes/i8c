@@ -61,7 +61,7 @@ void gen_code_declaration(Node* ast) {
         stack_space += cur_declaration->type->size;
         cur_declaration = cur_declaration->right_node;
     }
-    fprintf(output_file, "\tsub\t$%d, %%rsp\n", stack_space+4); 
+    fprintf(output_file, "\tsub\t$%d, %%rsp\n", stack_space+12); 
 }
 
 void gen_code_function_definition(Node* ast) {
@@ -89,12 +89,14 @@ void gen_code_if(Node* ast) {
             gen_code(ast->left_node);
             fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
             fprintf(output_file, "\tjge\t.UL%d\n", cur_label);
+            gen_code(ast->right_node);
             fprintf(output_file, ".UL%d:\n", cur_label);
             break;
         case EQ:
             gen_code(ast->left_node);
             fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
             fprintf(output_file, "\tjne\t.UL%d\n", cur_label);
+            gen_code(ast->right_node);
             fprintf(output_file, ".UL%d:\n", cur_label);
             break;
     }
@@ -117,6 +119,12 @@ void gen_code_func_call(Node* ast) {
     fprintf(output_file, "\tmov\t%%rax, %%rdi\n");
     fprintf(output_file, "\txor\t%%eax, %%eax\n");
     fprintf(output_file, "\tcall\t%s\n", symbol->symbol_name);
+}
+
+void gen_code_return(Node* ast) {
+    gen_code(ast->return_node);
+    fprintf(output_file, "\tleave\n");
+    fprintf(output_file, "\tret\n");
 }
 
 void gen_code(Node* ast) {
@@ -142,7 +150,7 @@ void gen_code(Node* ast) {
     } else if (ast->kind == KIND_FUNC_DEF) {
         put_symbol(top_environment(), ast->symbol);
     } else if (ast->kind == KIND_RETURN) {
-        gen_code(ast->return_node);
+        gen_code_return(ast);
     } else if (ast->kind == KIND_SYMBOL) {
         gen_code_symbol(ast);
     } else if (ast->kind == KIND_STRING) {

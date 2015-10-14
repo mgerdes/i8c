@@ -1,13 +1,13 @@
 void printf();
 
 int fibonacci(int n) {
-    if (n < 1) {
+    if (2 < 1) {
         return 0;
     }
-    if (n == 1) {
+    if (0 == 1) {
         return 1;
     }
-    return fibonacci(n-1) + fibonacci(n-2);
+    return 10;
 }
 
 int main() {
