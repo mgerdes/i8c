@@ -16,7 +16,7 @@ void yyerror(const char *str) {
 %token LTE GTE
 
 %left '='
-%left '<' '>' LTE GTE
+%left '<' '>' LTE GTE EQ
 %right '+' '-'
 
 %%
@@ -260,6 +260,15 @@ boolean_expression
             bin_op->right_node = $3;
             bin_op->op = GTE;
             $$ = bin_op;
+        }
+    | expression EQ expression
+        {
+            Node* eq_op = new_node();
+            eq_op->kind = KIND_BIN_OP;
+            eq_op->left_node = $1;
+            eq_op->right_node = $3;
+            eq_op->op = EQ;
+            $$ = eq_op;
         }
     ;
 

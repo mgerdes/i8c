@@ -31,6 +31,7 @@ A {L}|{D}
 ">="        { return GTE; }
 "<"         { return '<'; }
 "<="        { return LTE; }
+"=="        { return EQ; }
 
 ";"         { return ';'; }
 ","         { return ','; }

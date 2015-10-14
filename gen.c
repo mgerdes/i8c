@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "i8c.h"
+#include "parser.tab.h"
 
 FILE* output_file;
 
@@ -14,6 +15,11 @@ void write_header() {
 
 void write_footer() {
 
+}
+
+int gen_unique_label_num() {
+    static int label_num = 0;
+    return label_num++;
 }
 
 void gen_code_bin_op(Node* ast) {
@@ -76,6 +82,24 @@ void gen_code_string(Node* ast) {
     fprintf(output_file, "\tlea\t.L0(%rip), %%eax\n");
 }
 
+void gen_code_if(Node* ast) {
+    int cur_label = gen_unique_label_num();
+    switch (ast->left_node->op) {
+        case '<':
+            gen_code(ast->left_node);
+            fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
+            fprintf(output_file, "\tjge\t.UL%d\n", cur_label);
+            fprintf(output_file, ".UL%d:\n", cur_label);
+            break;
+        case EQ:
+            gen_code(ast->left_node);
+            fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
+            fprintf(output_file, "\tjne\t.UL%d\n", cur_label);
+            fprintf(output_file, ".UL%d:\n", cur_label);
+            break;
+    }
+}
+
 void gen_code_func_call(Node* ast) {
     Node* symbol = get_symbol(top_environment(), ast->symbol);
     if (!symbol) {
@@ -129,8 +153,7 @@ void gen_code(Node* ast) {
         gen_code(ast->left_node);
         gen_code(ast->right_node);
     } else if (ast->kind == KIND_IF) {
-        gen_code(ast->left_node);
-        gen_code(ast->right_node);
+        gen_code_if(ast);
     } else if (ast->kind == KIND_BIN_OP) {
         gen_code_bin_op(ast);
     } else if (ast->kind == KIND_BLOCK) {

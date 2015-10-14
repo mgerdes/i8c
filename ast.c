@@ -22,6 +22,9 @@ void print_binary_operator(int bin_op) {
         case GTE:
             printf(">=");
             break;
+        case EQ:
+            printf("==");
+            break;
         default : 
             printf("Unknown operator");
     }
