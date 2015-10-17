@@ -29,6 +29,9 @@ void gen_code_bin_op(Node* ast) {
     fprintf(output_file, "\tpop\t%%rbx\n");
     if (ast->op == '+') {
         fprintf(output_file, "\tadd\t%%ebx, %%eax\n");
+    } else if (ast->op == '-') {
+        fprintf(output_file, "\tsub\t%%eax, %%ebx\n");
+        fprintf(output_file, "\tmov\t%%ebx, %%eax\n");
     }
 }
 
@@ -69,6 +72,42 @@ void gen_code_function_definition(Node* ast) {
     fprintf(output_file, "%s:\n", ast->symbol->symbol_name);
     fprintf(output_file, "\tpush\t%%rbp\n");
     fprintf(output_file, "\tmov\t%%rsp, %%rbp\n");
+
+    fprintf(output_file, "\tsub\t$%d, %%rsp\n", 16); 
+
+    Node* function_definition_args = ast->left_node;
+    int i = 0;
+    while (function_definition_args) {
+        int symbol_offset = get_symbol(top_environment(), function_definition_args)->offset;
+
+        switch(i) {
+            case 0:
+                fprintf(output_file, "\tmov %%edi, ");
+                break;
+            case 1:
+                fprintf(output_file, "\tmov %%esi, ");
+                break;
+            case 2:
+                fprintf(output_file, "\tmov %%edx, ");
+                break;
+            case 3:
+                fprintf(output_file, "\tmov %%ecx, ");
+                break;
+            case 4:
+                fprintf(output_file, "\tmov %%r8d, ");
+                break;
+            case 5:
+                fprintf(output_file, "\tmov %%r9d, ");
+                break;
+            default:
+                fprintf(output_file, "\tpop ");
+                break;
+        }
+        fprintf(output_file, "-%d(%%rbp)\n", symbol_offset);
+        function_definition_args = function_definition_args->right_node;
+        i++;
+    }
+
     gen_code(ast->body_node);
     fprintf(output_file, "\tleave\n");
     fprintf(output_file, "\tret\n");
@@ -107,16 +146,40 @@ void gen_code_func_call(Node* ast) {
     if (!symbol) {
         fprintf(output_file, "WE COULD NOT FIND THE SYMBOL %s\n", ast->symbol->symbol_name);
     }
+    int i = 0;
     Node* function_call_args = ast->left_node;
     while (function_call_args) {
         gen_code(function_call_args->left_node);
-        fprintf(output_file, "\tpush\t%%rax\n");
+        switch(i) {
+            case 0:
+                fprintf(output_file, "\tmov\t%%eax, %%edi\n");
+                break;
+            case 1:
+                fprintf(output_file, "\tmov\t%%eax, %%esi\n");
+                break;
+            case 2:
+                fprintf(output_file, "\tmov\t%%eax, %%edx\n");
+                break;
+            case 3:
+                fprintf(output_file, "\tmov\t%%eax, %%ecx\n");
+                break;
+            case 4:
+                fprintf(output_file, "\tmov\t%%eax, %%r8d\n");
+                break;
+            case 5:
+                fprintf(output_file, "\tmov\t%%eax, %%r9d\n");
+                break;
+            default:
+                fprintf(output_file, "\tpush\t%%rax\n");
+                break;
+        }
         function_call_args = function_call_args->right_node;
+        i++;
     }
-    fprintf(output_file, "\tpop\t%%rax\n");
-    fprintf(output_file, "\tmov\t%%rax, %%rsi\n");
-    fprintf(output_file, "\tpop\t%%rax\n");
-    fprintf(output_file, "\tmov\t%%rax, %%rdi\n");
+    //fprintf(output_file, "\tpop\t%%rax\n");
+    //fprintf(output_file, "\tmov\t%%rax, %%rsi\n");
+    //fprintf(output_file, "\tpop\t%%rax\n");
+    //fprintf(output_file, "\tmov\t%%rax, %%rdi\n");
     fprintf(output_file, "\txor\t%%eax, %%eax\n");
     fprintf(output_file, "\tcall\t%s\n", symbol->symbol_name);
 }
@@ -127,6 +190,32 @@ void gen_code_return(Node* ast) {
     fprintf(output_file, "\tret\n");
 }
 
+void gen_code_block(Node* ast) {
+    if (ast->left_node->kind == KIND_BLOCK) {
+        push_new_environment();
+        gen_code(ast->left_node);
+        pop_environment();
+    } else {
+        gen_code(ast->left_node);
+    }
+    gen_code(ast->right_node);
+}
+
+void gen_code_func(Node* func) {
+    put_symbol(top_environment(), func->symbol);
+
+    push_new_environment();
+
+    Node* function_definition_args = func->left_node;
+    while (function_definition_args) {
+        put_symbol(top_environment(), function_definition_args);
+        function_definition_args = function_definition_args->right_node;
+    }
+
+    gen_code_function_definition(func);
+    pop_environment();
+}
+
 void gen_code(Node* ast) {
     if (!ast) {
         return;
@@ -135,18 +224,7 @@ void gen_code(Node* ast) {
     if (ast->kind == KIND_CONSTANT) {
         gen_code_constant(ast);
     } else if (ast->kind == KIND_FUNC) {
-        put_symbol(top_environment(), ast->symbol);
-
-        push_new_environment();
-
-        Node* function_definition_args = ast->left_node;
-        while (function_definition_args) {
-            put_symbol(top_environment(), function_definition_args);
-            function_definition_args = function_definition_args->right_node;
-        }
-
-        gen_code_function_definition(ast);
-        pop_environment();
+        gen_code_func(ast);
     } else if (ast->kind == KIND_FUNC_DEF) {
         put_symbol(top_environment(), ast->symbol);
     } else if (ast->kind == KIND_RETURN) {
@@ -165,15 +243,7 @@ void gen_code(Node* ast) {
     } else if (ast->kind == KIND_BIN_OP) {
         gen_code_bin_op(ast);
     } else if (ast->kind == KIND_BLOCK) {
-        if (ast->left_node->kind == KIND_BLOCK) {
-            // this is an inner block, needs new environment
-            push_new_environment();
-            gen_code(ast->left_node);
-            pop_environment();
-        } else {
-            gen_code(ast->left_node);
-        }
-        gen_code(ast->right_node);
+        gen_code_block(ast);
     } else if (ast->kind == KIND_DECLARATION) {
         gen_code_declaration(ast);
     } else if (ast->kind == KIND_PROGRAM) {

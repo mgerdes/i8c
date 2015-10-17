@@ -1,13 +1,13 @@
 void printf();
 
 int fibonacci(int n) {
-    if (2 < 1) {
+    if (n < 1) {
         return 0;
-    }
-    if (0 == 1) {
+    } 
+    if (n == 1) {
         return 1;
     }
-    return 10;
+    return fibonacci(n-1) + fibonacci(n-2);
 }
 
 int main() {
@@ -18,7 +18,6 @@ int main() {
 
     int z;
     z = a + b + c;
-    z = fibonacci(10);
-
-    printf("z is : %d\n", z);
+    z = fibonacci(11);
+    printf("%d\n", z);
 }

@@ -3,12 +3,11 @@
 #include <stdlib.h>
 #include "i8c.h"
 
-int total_offset = 0;
-
 Environment* cur_environment;
 
 Environment* new_environment() {
     Environment* new_environment = malloc(sizeof(Environment));
+    new_environment->total_offset = 4;
     return new_environment;
 }
 
@@ -26,7 +25,6 @@ void push_new_environment() {
 void pop_environment() {
     Environment_Element* cur_element = cur_environment->first_element;
     while (cur_element) {
-        total_offset -= 4;
         cur_element = cur_element->next_element;
     }
     cur_environment = cur_environment->parent_environment;     
@@ -38,8 +36,8 @@ Environment* top_environment() {
 
 void put_symbol(Environment* env, Node* symbol) {
     Environment_Element* element = new_element();    
-    symbol->offset = total_offset;
-    total_offset += 4;
+    symbol->offset = env->total_offset;
+    env->total_offset += 4;
     element->symbol = symbol;
     element->symbol_name = symbol->symbol_name;
 

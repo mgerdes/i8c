@@ -58,6 +58,7 @@ typedef struct Environment_Element {
 typedef struct Environment {
     struct Environment* parent_environment;        
     Environment_Element* first_element;
+    int total_offset;
 } Environment;
 
 void put_symbol(Environment* env, Node* symbol); 
