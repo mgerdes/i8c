@@ -121,24 +121,37 @@ void gen_code_string(Node* ast) {
     fprintf(output_file, "\tlea\t.L0(%rip), %%eax\n");
 }
 
-void gen_code_if(Node* ast) {
-    int cur_label = gen_unique_label_num();
-    switch (ast->left_node->op) {
+void gen_code_boolean_expr(Node* expr, int cur_label) {
+    gen_code(expr);
+    fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
+    switch (expr->op) {
         case '<':
-            gen_code(ast->left_node);
-            fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
             fprintf(output_file, "\tjge\t.UL%d\n", cur_label);
-            gen_code(ast->right_node);
-            fprintf(output_file, ".UL%d:\n", cur_label);
+            break;
+        case '>':
+            fprintf(output_file, "\tjle\t.UL%d\n", cur_label);
             break;
         case EQ:
-            gen_code(ast->left_node);
-            fprintf(output_file, "\tcmp\t%%eax, %%ebx\n");
             fprintf(output_file, "\tjne\t.UL%d\n", cur_label);
-            gen_code(ast->right_node);
-            fprintf(output_file, ".UL%d:\n", cur_label);
             break;
     }
+}
+
+void gen_code_if(Node* ast) {
+    int cur_label = gen_unique_label_num();
+    gen_code_boolean_expr(ast->left_node, cur_label);
+    gen_code(ast->right_node);
+    fprintf(output_file, ".UL%d:\n", cur_label);
+}
+
+void gen_code_while(Node* while_loop) {
+    int start_label = gen_unique_label_num();
+    int end_label = gen_unique_label_num();
+    fprintf(output_file, ".UL%d:\n", start_label);
+    gen_code_boolean_expr(while_loop->left_node, end_label);
+    gen_code(while_loop->right_node);
+    fprintf(output_file, "\tjmp\t.UL%d\n", start_label);
+    fprintf(output_file, ".UL%d:\n", end_label);
 }
 
 void gen_code_func_call(Node* ast) {
@@ -176,10 +189,6 @@ void gen_code_func_call(Node* ast) {
         function_call_args = function_call_args->right_node;
         i++;
     }
-    //fprintf(output_file, "\tpop\t%%rax\n");
-    //fprintf(output_file, "\tmov\t%%rax, %%rsi\n");
-    //fprintf(output_file, "\tpop\t%%rax\n");
-    //fprintf(output_file, "\tmov\t%%rax, %%rdi\n");
     fprintf(output_file, "\txor\t%%eax, %%eax\n");
     fprintf(output_file, "\tcall\t%s\n", symbol->symbol_name);
 }
@@ -236,8 +245,7 @@ void gen_code(Node* ast) {
     } else if (ast->kind == KIND_ASSIGNMENT) {
         gen_code_assignment(ast);
     } else if (ast->kind == KIND_WHILE) {
-        gen_code(ast->left_node);
-        gen_code(ast->right_node);
+        gen_code_while(ast);
     } else if (ast->kind == KIND_IF) {
         gen_code_if(ast);
     } else if (ast->kind == KIND_BIN_OP) {

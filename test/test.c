@@ -10,14 +10,19 @@ int fibonacci(int n) {
     return fibonacci(n-1) + fibonacci(n-2);
 }
 
-int main() {
-    int a,b,c;
-    a = 5;
-    b = 123;
-    c = 15 + a + b;
+int sum(int n) {
+    int sum;
+    sum = 0;
+    while (n > 0) {
+        sum = sum + n;
+        n = n - 1;
+    }
+    return sum;
+}
 
-    int z;
-    z = a + b + c;
-    z = fibonacci(11);
-    printf("%d\n", z);
+int main() {
+    int a,b;
+    a = fibonacci(11);
+    b = sum(10);
+    printf("%d\n", a + b);
 }
