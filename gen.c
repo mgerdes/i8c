@@ -230,37 +230,53 @@ void gen_code(Node* ast) {
         return;
     }
 
-    if (ast->kind == KIND_CONSTANT) {
-        gen_code_constant(ast);
-    } else if (ast->kind == KIND_FUNC) {
-        gen_code_func(ast);
-    } else if (ast->kind == KIND_FUNC_DEF) {
-        put_symbol(top_environment(), ast->symbol);
-    } else if (ast->kind == KIND_RETURN) {
-        gen_code_return(ast);
-    } else if (ast->kind == KIND_SYMBOL) {
-        gen_code_symbol(ast);
-    } else if (ast->kind == KIND_STRING) {
-        gen_code_string(ast);
-    } else if (ast->kind == KIND_ASSIGNMENT) {
-        gen_code_assignment(ast);
-    } else if (ast->kind == KIND_WHILE) {
-        gen_code_while(ast);
-    } else if (ast->kind == KIND_IF) {
-        gen_code_if(ast);
-    } else if (ast->kind == KIND_BIN_OP) {
-        gen_code_bin_op(ast);
-    } else if (ast->kind == KIND_BLOCK) {
-        gen_code_block(ast);
-    } else if (ast->kind == KIND_DECLARATION) {
-        gen_code_declaration(ast);
-    } else if (ast->kind == KIND_PROGRAM) {
-        gen_code(ast->left_node);
-        gen_code(ast->right_node);
-    } else if (ast->kind == KIND_FUNC_CALL) {
-        gen_code_func_call(ast);
-    } else {
-        fprintf(output_file, "(UNKNOWN KIND %d)\n", ast->kind);
+    switch(ast->kind) {
+        case KIND_CONSTANT:
+            gen_code_constant(ast);
+            break;
+        case KIND_FUNC:
+            gen_code_func(ast);
+            break;
+        case KIND_FUNC_DEF:
+            put_symbol(top_environment(), ast->symbol);
+            break;
+        case KIND_RETURN:
+            gen_code_return(ast);
+            break;
+        case KIND_SYMBOL:
+            gen_code_symbol(ast);
+            break;
+        case KIND_STRING:
+            gen_code_string(ast);
+            break;
+        case KIND_ASSIGNMENT:
+            gen_code_assignment(ast);
+            break;
+        case KIND_WHILE:
+            gen_code_while(ast);
+            break;
+        case KIND_IF:
+            gen_code_if(ast);
+            break;
+        case KIND_BIN_OP:
+            gen_code_bin_op(ast);
+            break;
+        case KIND_BLOCK:
+            gen_code_block(ast);
+            break;
+        case KIND_DECLARATION:
+            gen_code_declaration(ast);
+            break;
+        case KIND_PROGRAM:
+            gen_code(ast->left_node);
+            gen_code(ast->right_node);
+            break;
+        case KIND_FUNC_CALL:
+            gen_code_func_call(ast);
+            break;
+        default:
+            fprintf(output_file, "(UNKNOWN KIND %d)\n", ast->kind);
+            break;
     }
 }
 
