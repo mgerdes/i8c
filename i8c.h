@@ -19,11 +19,95 @@ enum {
 };
 
 enum {
+    LIST, SYMBOL, FUNC_DEF, WHILE_LOOP, IF_ELSE,
+    DECLARATION, ASSIGNMENT, CONSTANT, FUNC_CALL,
+    BINARY_OP
+};
+
+enum {
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_ARRAY,
     TYPE_VOID,
 };
+
+typedef struct List {
+    int kind;
+    struct Node* head;
+    struct List* rest;
+} List;
+
+typedef struct Symbol {
+    int kind;
+    int offset;
+    char* name;
+    struct Type* type;
+} Symbol;
+
+typedef struct Function_Definition {
+    int kind;
+    struct Type* return_type;
+    struct Symbol* name;
+    struct List* parameter_declarations;
+    struct Node* statements;
+} Function_Definition;
+
+typedef struct While_Loop {
+    int kind;
+    struct Node* expression;
+    struct Node* statements;
+} While_Loop;
+
+typedef struct If_Else {
+    int kind;
+    struct Node* expression;
+    struct Node* statements_if_true;
+    struct Node* statements_if_false;
+} If_Else;
+
+typedef struct Declaration {
+    int kind;
+    struct Type* type;
+    struct List* variables;
+} Declaration;
+
+typedef struct Assignment {
+    int kind;
+    struct Node* l_value;
+    struct Node* r_value;
+} Assignment;
+
+typedef struct Constant {
+    int kind;
+    union {
+        float float_value;
+        int int_value;
+        char* string_value;
+    };
+} Constant;
+
+typedef struct Function_Call {
+    int kind;
+    struct Symbol* symbol;
+    struct List* function_arguments;
+} Function_Call;
+
+typedef struct Binary_Operator {
+    int kind;
+    struct Node* left_expression;
+    struct Node* right_expression;
+} Binary_Operator;
+
+List* new_list();
+Symbol* new_symbol();
+Function_Definition* new_function_definition();
+While_Loop* new_while_loop();
+If_Else* new_if_else();
+Declaration* new_declaration();
+Assignment* new_assignment();
+Constant* new_constant();
+Function_Call* new_function_call();
+Binary_Operator* new_binary_operator();
 
 typedef struct Node {
     int kind;

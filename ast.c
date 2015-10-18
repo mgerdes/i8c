@@ -8,6 +8,66 @@ Node* new_node() {
     return n;
 }
 
+List* new_list() {
+    List* l = malloc(sizeof(List));
+    l->kind = LIST;
+    return l;
+}
+
+Symbol* new_symbol() {
+    Symbol* s = malloc(sizeof(Symbol)); 
+    s->kind = SYMBOL;
+    return s;
+}
+
+Function_Definition* new_function_definition() {
+    Function_Definition* f = malloc(sizeof(Function_Definition)); 
+    f->kind = FUNC_DEF;
+    return f;
+}
+
+While_Loop* new_while_loop() {
+    While_Loop* w = malloc(sizeof(While_Loop));
+    w->kind = WHILE_LOOP;
+    return w;
+}
+
+If_Else* new_if_else() {
+    If_Else* i = malloc(sizeof(If_Else));
+    i->kind = IF_ELSE;
+    return i;
+}
+
+Declaration* new_declaration() {
+    Declaration* d = malloc(sizeof(Declaration));
+    d->kind = DECLARATION;
+    return d;
+}
+
+Assignment* new_assignment() {
+    Assignment* a = malloc(sizeof(Assignment));
+    a->kind = ASSIGNMENT;
+    return a;
+}
+
+Constant* new_constant() {
+    Constant* c = malloc(sizeof(Constant));
+    c->kind = CONSTANT;
+    return c;
+}
+
+Function_Call* new_function_call() {
+    Function_Call* f = malloc(sizeof(Function_Call));
+    f->kind = FUNC_CALL;
+    return f;
+}
+
+Binary_Operator* new_binary_operator() {
+    Binary_Operator* b = malloc(sizeof(Binary_Operator));
+    b->kind = BINARY_OP;
+    return b;
+}
+
 void print_binary_operator(int bin_op) {
     switch(bin_op){
         case '+':
