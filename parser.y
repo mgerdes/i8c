@@ -2,8 +2,6 @@
 #define YYSTYPE Node*
 #include "i8c.h"
 
-Environment* current_environment;
-
 int yyparse(void);
 int yylex();
 void yyerror(const char *str) {
@@ -29,57 +27,42 @@ start
     ;
 
 program
-    : function_definition program
+    : 
         {
-            Node* program = new_node();
-            program->left_node = $1;
-            program->right_node = $2;
-            program->kind = KIND_PROGRAM;
-            $$ = program;
+            $$ = 0;
+        }
+    | function_definition program
+        {
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $2;
+            $$ = (Node*) l;
         }
     | declaration ';' program
         {
-            Node* program = new_node();
-            program->left_node = $1;
-            program->right_node = $3;
-            program->kind = KIND_PROGRAM;
-            $$ = program;
-        }
-    |  
-        {
-            $$ = 0;
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $3;
+            $$ = (Node*) l;
         }
     ;
 
 function_definition
-    : type IDENTIFIER '(' function_definition_args ')' 
+    : type IDENTIFIER '(' function_definition_args ')' '{' block '}' 
         {
-            $2->left_node = $4;
-            $2->type = $1->type;
-
-            Node* function_definition_args = $4; 
-            while (function_definition_args) {
-                function_definition_args = function_definition_args->right_node;
-            }
-        }
-      '{' block '}' 
-        {
-            Node* function = new_node();
-            function->kind = KIND_FUNC;
-            function->left_node = $4;
-            function->body_node = $8;
-            function->symbol = $2;
-            $$ = function;
+            Function_Definition* f = new_function_definition();
+            f->identifier = (Symbol*) $2;
+            f->parameter_declarations = (List*) $4;
+            f->statements = $7;
+            $$ = (Node*) f;
         }
     | type IDENTIFIER '(' function_definition_args ')' ';'
         {
-            $2->left_node = $4;
-            $2->type = $1->type;
-
-            Node* function_def = new_node();
-            function_def->kind = KIND_FUNC_DEF;
-            function_def->symbol = $2;
-            $$ = function_def;
+            Function_Definition* f = new_function_definition();
+            f->identifier = (Symbol*) $2;
+            f->parameter_declarations = (List*) $4;
+            f->statements = 0;
+            $$ = (Node*) f;
         }
     ;
 
@@ -90,54 +73,54 @@ function_definition_args
         }
     | type IDENTIFIER
         {
-            Node* function_definition_args = new_node();
-            function_definition_args->kind = KIND_SYMBOL;
-            function_definition_args->type = $1->type; 
-            function_definition_args->symbol_name = $2->symbol_name;
-            function_definition_args->right_node = 0;
-            $$ = function_definition_args;
+            List* l1 = new_list();
+            l1->head = (Node*) $2;
+
+            Declaration* d = new_declaration();
+            d->identifiers = l1;
+
+            List* function_parameters = new_list();
+            function_parameters->head = (Node*) d;
+            function_parameters->rest = 0;
+
+            $$ = (Node*) function_parameters;
         }
     | type IDENTIFIER ',' function_definition_args
         {
-            Node* function_definition_args = new_node();
-            function_definition_args->kind = KIND_SYMBOL;
-            function_definition_args->type = $1->type; 
-            function_definition_args->symbol_name = $2->symbol_name;
-            function_definition_args->right_node = $4;
-            $$ = function_definition_args;
+            List* l1 = new_list();
+            l1->head = (Node*) $2;
+
+            Declaration* d = new_declaration();
+            d->identifiers = l1;
+
+            List* function_parameters = new_list();
+            function_parameters->head = (Node*) d;
+            function_parameters->rest = (List*) $4;
+
+            $$ = (Node*) function_parameters;
         }
     ;
 
 block
-    : statement block
-        {
-            Node* block = new_node();
-            block->kind = KIND_BLOCK;
-            block->left_node = $1;
-            block->right_node = $2;
-            $$ = block;
-        }
-    | '{' block '}' block
-        {
-            Node* block = new_node();
-            block->kind = KIND_BLOCK;
-            block->left_node = $2;
-            block->right_node = $4;
-            $$ = block;
-        }
-    | 
+    : 
         {
             $$ = 0;
+        }
+    | statement block
+        {
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $2;
+            $$ = (Node*) l;
         }
     ;
 
 statement
     : RETURN expression ';' 
         {
-            Node* return_stmt = new_node();
-            return_stmt->kind = KIND_RETURN;
-            return_stmt->return_node = $2;
-            $$ = return_stmt;
+            Return* r = new_return();
+            r->expression = $2;
+            $$ = (Node*) r;
         }
     | while_loop
     | if_statement 
@@ -149,55 +132,89 @@ statement
 while_loop
     : WHILE '(' expression ')' '{' block '}'
         {
-            Node* while_loop = new_node();
-            while_loop->kind = KIND_WHILE;
-            while_loop->left_node = $3;
-            while_loop->right_node = $6;
-            $$ = while_loop;
+            While_Loop* w = new_while_loop();
+            w->expression = $3;
+            w->statements = $6;
+            $$ = (Node*) w;
         }
     ;
 
 if_statement
     : IF '(' expression ')' '{' block '}'
         {
-            Node* if_statement = new_node();
-            if_statement->kind = KIND_IF;
-            if_statement->left_node = $3;
-            if_statement->right_node = $6;
-            $$ = if_statement;
+            If_Else* i = new_if_else();
+            i->expression = $3;
+            i->statements = $6;
+            $$ = (Node*) i;
         }
     ;
 
 expression
     : expression '+' expression
         {
-            Node* add_node = new_node();
-            add_node->kind = KIND_BIN_OP;
-            add_node->op = '+';
-            add_node->left_node = $1;
-            add_node->right_node = $3;
-            $$ = add_node;
+            Binary_Operator* b = new_binary_operator();
+            b->op = '+';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
         }
     | expression '-' expression
         {
-            Node* sub_node = new_node();
-            sub_node->kind = KIND_BIN_OP;
-            sub_node->op = '-';
-            sub_node->left_node = $1;
-            sub_node->right_node = $3;
-            $$ = sub_node;
+            Binary_Operator* b = new_binary_operator();
+            b->op = '-';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
         }
-    | boolean_expression
+    | expression '>' expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '>';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression '<' expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '<';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression LTE expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = LTE;
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression GTE expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = GTE;
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression EQ expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = EQ;
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
     | NUMBER
     | STRING
     | IDENTIFIER
     | IDENTIFIER '(' function_call_args ')'
         {
-            Node* fn_call = new_node();
-            fn_call->kind = KIND_FUNC_CALL;
-            fn_call->left_node = $3;
-            fn_call->symbol = $1;
-            $$ = fn_call;
+            Function_Call* f = new_function_call();
+            f->identifier = (Symbol*) $1; 
+            f->arguments = (List*) $3;
+            $$ = (Node*) f;
         }
     ;
 
@@ -208,145 +225,60 @@ function_call_args
         }
     | expression ',' function_call_args
         {
-            Node* function_call_args = new_node();
-            function_call_args->kind = KIND_FUNC_CALL_ARGS;
-            function_call_args->left_node = $1;
-            function_call_args->right_node = $3;
-            $$ = function_call_args;
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $3;
+            $$ = (Node*) l;
         }
     | expression
         {
-            Node* function_call_args = new_node();
-            function_call_args->kind = KIND_FUNC_CALL_ARGS;
-            function_call_args->left_node = $1;
-            function_call_args->right_node = 0;
-            $$ = function_call_args;
-        }
-    ;
-
-boolean_expression
-    : expression '>' expression
-        {
-            Node* bin_op = new_node();
-            bin_op->kind = KIND_BIN_OP;
-            bin_op->left_node = $1;
-            bin_op->right_node = $3;
-            bin_op->op = '>';
-            $$ = bin_op;
-        }
-    | expression '<' expression
-        {
-            Node* bin_op = new_node();
-            bin_op->kind = KIND_BIN_OP;
-            bin_op->left_node = $1;
-            bin_op->right_node = $3;
-            bin_op->op = '<';
-            $$ = bin_op;
-        }
-    | expression LTE expression
-        {
-            Node* bin_op = new_node();
-            bin_op->kind = KIND_BIN_OP;
-            bin_op->left_node = $1;
-            bin_op->right_node = $3;
-            bin_op->op = LTE;
-            $$ = bin_op;
-        }
-    | expression GTE expression
-        {
-            Node* bin_op = new_node();
-            bin_op->kind = KIND_BIN_OP;
-            bin_op->left_node = $1;
-            bin_op->right_node = $3;
-            bin_op->op = GTE;
-            $$ = bin_op;
-        }
-    | expression EQ expression
-        {
-            Node* eq_op = new_node();
-            eq_op->kind = KIND_BIN_OP;
-            eq_op->left_node = $1;
-            eq_op->right_node = $3;
-            eq_op->op = EQ;
-            $$ = eq_op;
+            List* l = new_list();
+            l->head = $1;
+            l->rest = 0;
+            $$ = (Node*) l;
         }
     ;
 
 declaration
     : type list_of_identifiers 
         {
-            Node* current_declaration = $2;
-
-            // give each identifier the correct type
-            while (current_declaration) {
-                current_declaration->type = $1->type;
-                current_declaration = current_declaration->right_node;
-            }
-            
-            Node* declaration_stmt = new_node();
-            declaration_stmt->kind = KIND_DECLARATION;
-            declaration_stmt->right_node = $2; 
-            $$ = declaration_stmt;
-        }
-    | type IDENTIFIER '[' NUMBER ']'
-        {
-            $2->type = make_array_type($1->type, $4->i_value);
-
-            Node* array_declaration = new_node();
-            array_declaration->kind = KIND_DECLARATION;
-            array_declaration->symbol = $2;
-            $$ = array_declaration; 
+            Declaration* d = new_declaration();
+            d->identifiers = (List*) $2;
+            $$ = (Node*) d;
         }
     ;
 
 list_of_identifiers
     : IDENTIFIER
         {
-            Node* identifier_list = new_node();
-            identifier_list->kind = KIND_IDENTIFIER_LIST;
-            identifier_list->symbol = $1;
-            identifier_list->right_node = 0;
-            $$ = identifier_list;
+            List* l = new_list();
+            l->head = $1;
+            l->rest = 0;
+            $$ = (Node*) l;
         }
     | IDENTIFIER ',' list_of_identifiers
         {
-            Node* identifier_list = new_node();
-            identifier_list->kind = KIND_IDENTIFIER_LIST;
-            identifier_list->symbol = $1;
-            identifier_list->right_node = $3;
-            $$ = identifier_list;
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $3;
+            $$ = (Node*) l;
         }
+    ;
 
 assignment
     : IDENTIFIER '=' expression 
         {
-            Node* assignment_stmt = new_node();
-            assignment_stmt->kind = KIND_ASSIGNMENT;
-            assignment_stmt->symbol = $1; 
-            assignment_stmt->right_node = $3; 
-            $$ = assignment_stmt;
+            Assignment* a = new_assignment();
+            a->l_value = $1;
+            a->r_value = $3;
+            $$ = (Node*) a;
         }
     ;
 
 type
     : INT
-        {
-            Node* type = new_node();
-            type->type = type_int;
-            $$ = type;
-        }
     | FLOAT
-        {
-            Node* type = new_node();
-            type->type = type_float;
-            $$ = type;
-        }
     | VOID
-        {
-            Node* type = new_node();
-            type->type = type_void;
-            $$ = type;
-        }
     ;
 
 %%

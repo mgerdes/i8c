@@ -44,37 +44,34 @@ A {L}|{D}
 
 
 \"(\\.|[^"])*\" {
-                    Node* string = new_node();
-                    string->kind = KIND_STRING;
-                    string->s_value = strdup(yytext);
-                    yylval = string;
+                    Constant* c = new_constant();
+                    c->constant_kind = STRING_CONSTANT;
+                    c->string_value = strdup(yytext);
+                    yylval = (Node*) c;
 
                     return STRING;
                 };
 
 {L}{A}*     { 
-                Node* symbol = new_node();
-                symbol->kind = KIND_SYMBOL;
-                symbol->symbol_name = strdup(yytext);
-                yylval = symbol;
+                Symbol* s = new_symbol();
+                s->name = strdup(yytext);
+                yylval = (Node*) s;
 
                 return IDENTIFIER; 
             };
 {D}*        { 
-                Node* number = new_node();
-                number->kind = KIND_CONSTANT;
-                number->type = type_int;
-                number->i_value = atoi(yytext);
-                yylval = number;
+                Constant* n = new_constant();
+                n->constant_kind = INT_CONSTANT;
+                n->int_value = atoi(yytext);
+                yylval = (Node*) n;
 
                 return NUMBER; 
             };
 ({D}*\.{D}*)|({D}*\.)|(\.{D}*) {
-                Node* number = new_node();
-                number->kind = KIND_CONSTANT;
-                number->type = type_float;
-                number->f_value = atof(yytext);
-                yylval = number;
+                Constant* f = new_constant();
+                f->constant_kind = FLOAT_CONSTANT;
+                f->int_value = atof(yytext);
+                yylval = (Node*) f;
 
                 return NUMBER; 
             };

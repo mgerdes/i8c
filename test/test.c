@@ -11,13 +11,6 @@ int fibonacci(int n) {
 }
 
 int sum(int n) {
-    int sum;
-    sum = 0;
-    while (n > 0) {
-        sum = sum + n;
-        n = n - 1;
-    }
-    return sum;
 }
 
 int main() {

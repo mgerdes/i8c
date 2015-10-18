@@ -1,35 +1,16 @@
 enum {
-    KIND_FUNC,
-    KIND_CONSTANT,
-    KIND_RETURN,
-    KIND_SYMBOL,
-    KIND_ASSIGNMENT,
-    KIND_BLOCK,
-    KIND_DECLARATION,
-    KIND_FUNC_CALL,
-    KIND_WHILE,
-    KIND_FOR,
-    KIND_IF,
-    KIND_BIN_OP,
-    KIND_FUNC_CALL_ARGS,
-    KIND_PROGRAM,
-    KIND_IDENTIFIER_LIST,
-    KIND_STRING,
-    KIND_FUNC_DEF
-};
-
-enum {
     LIST, SYMBOL, FUNC_DEF, WHILE_LOOP, IF_ELSE,
     DECLARATION, ASSIGNMENT, CONSTANT, FUNC_CALL,
-    BINARY_OP
+    BINARY_OP, RETURN_STATEMENT
 };
 
 enum {
-    TYPE_INT,
-    TYPE_FLOAT,
-    TYPE_ARRAY,
-    TYPE_VOID,
+    INT_CONSTANT, FLOAT_CONSTANT, STRING_CONSTANT
 };
+
+typedef struct Node {
+    int kind;
+} Node;
 
 typedef struct List {
     int kind;
@@ -47,7 +28,7 @@ typedef struct Symbol {
 typedef struct Function_Definition {
     int kind;
     struct Type* return_type;
-    struct Symbol* name;
+    struct Symbol* identifier;
     struct List* parameter_declarations;
     struct Node* statements;
 } Function_Definition;
@@ -61,14 +42,13 @@ typedef struct While_Loop {
 typedef struct If_Else {
     int kind;
     struct Node* expression;
-    struct Node* statements_if_true;
-    struct Node* statements_if_false;
+    struct Node* statements;
 } If_Else;
 
 typedef struct Declaration {
     int kind;
     struct Type* type;
-    struct List* variables;
+    struct List* identifiers;
 } Declaration;
 
 typedef struct Assignment {
@@ -79,6 +59,7 @@ typedef struct Assignment {
 
 typedef struct Constant {
     int kind;
+    int constant_kind;
     union {
         float float_value;
         int int_value;
@@ -88,15 +69,21 @@ typedef struct Constant {
 
 typedef struct Function_Call {
     int kind;
-    struct Symbol* symbol;
-    struct List* function_arguments;
+    struct Symbol* identifier;
+    struct List* arguments;
 } Function_Call;
 
 typedef struct Binary_Operator {
     int kind;
+    int op;
     struct Node* left_expression;
     struct Node* right_expression;
 } Binary_Operator;
+
+typedef struct Return {
+    int kind;
+    struct Node* expression;
+} Return;
 
 List* new_list();
 Symbol* new_symbol();
@@ -108,65 +95,9 @@ Assignment* new_assignment();
 Constant* new_constant();
 Function_Call* new_function_call();
 Binary_Operator* new_binary_operator();
+Return* new_return();
 
-typedef struct Node {
-    int kind;
-    int op;
-    int offset;
-    long i_value;
-    double f_value;
-    char* s_value;
-    char* symbol_name;
-
-    struct Type* type;
-
-    struct Node* symbol;
-    struct Node* body_node;
-
-    struct Node* return_node;
-
-    struct Node* left_node;
-    struct Node* right_node;
-} Node;
+void print_ast(Node* ast);
 
 Node* program;
 Node* new_node();
-void print_ast(Node* ast);
-
-typedef struct Environment_Element {
-    Node* symbol;
-    char* symbol_name;
-    struct Environment_Element* next_element;
-} Environment_Element;
-
-typedef struct Environment {
-    struct Environment* parent_environment;        
-    Environment_Element* first_element;
-    int total_offset;
-} Environment;
-
-void put_symbol(Environment* env, Node* symbol); 
-Node* get_symbol(Environment* env, Node* symbol); 
-void push_new_environment();
-void pop_environment();
-Environment* top_environment();
-void print_environment(Environment* env);
-
-typedef struct Type {
-    int kind;
-    int size;
-
-    struct Type* ptr; 
-} Type;
-
-Type* make_array_type(Type* type, int array_size);
-Type* get_type(Node* e);
-
-extern Type *type_int;
-extern Type *type_float;
-extern Type *type_void;
-
-void init_code_gen(char*);
-void write_header();
-void write_footer();
-void gen_code(Node* ast); 
