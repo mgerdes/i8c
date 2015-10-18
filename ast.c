@@ -175,6 +175,11 @@ void print_ast_indented(Node* ast, int tabs) {
         case FUNC_CALL:
             u.fc = (Function_Call*) ast;
             printf("Function Call: %s\n", u.fc->identifier->name);
+            List* arguments = u.fc->arguments;
+            while (arguments) {
+                print_ast_indented(arguments->head, tabs+1);
+                arguments = arguments->rest;
+            }
             break;
         case BINARY_OP:
             u.b = (Binary_Operator*) ast;

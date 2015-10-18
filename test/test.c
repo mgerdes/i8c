@@ -11,11 +11,19 @@ int fibonacci(int n) {
 }
 
 int sum(int n) {
+    int sum;
+    sum = 0;
+    while (n > 0) {
+        sum = sum + n;   
+        n = n - 1;
+    }
+    return sum;
 }
 
 int main() {
     int a,b;
-    a = fibonacci(11);
-    b = sum(10);
-    printf("%d\n", a + b);
+    a = 10;
+    b = 10;
+    printf("%d\n", sum(a));
+    printf("%d\n", a);
 }

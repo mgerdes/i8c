@@ -85,6 +85,7 @@ typedef struct Return {
     struct Node* expression;
 } Return;
 
+Node* new_node();
 List* new_list();
 Symbol* new_symbol();
 Function_Definition* new_function_definition();
@@ -97,7 +98,25 @@ Function_Call* new_function_call();
 Binary_Operator* new_binary_operator();
 Return* new_return();
 
+typedef struct Environment_Element {
+    struct Symbol* symbol;
+    struct Environment_Element* next_element;
+} Environment_Element;
+
+typedef struct Environment {
+    int total_offset;
+    struct Environment* parent_environment;        
+    struct Environment_Element* first_element;
+} Environment;
+
+void put_symbol(Environment* env, Symbol* symbol); 
+Symbol* get_symbol(Environment* env, char* name); 
+void push_new_environment();
+void pop_environment();
+Environment* top_environment();
+
 void print_ast(Node* ast);
+void gen_code(Node* ast);
+void init_code_gen(char* file_name);
 
 Node* program;
-Node* new_node();
