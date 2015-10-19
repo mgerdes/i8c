@@ -1,13 +1,13 @@
 void printf();
 
-int fibonacci(int n) {
+int fib(int n) {
     if (n < 1) {
         return 0;
     } 
     if (n == 1) {
         return 1;
     }
-    return fibonacci(n-1) + fibonacci(n-2);
+    return fib(n-1) + fib(n-2);
 }
 
 int sum(int n) {
@@ -21,9 +21,9 @@ int sum(int n) {
 }
 
 int main() {
-    int a,b;
-    a = 10;
-    b = 10;
-    printf("%d\n", sum(a));
-    printf("%d\n", a);
+    int a;
+    a = 11;
+    printf("a = %d\n", a);
+    printf("fib %d = %d\n", a, fib(a));
+    printf("sum %d = %d\n", a, sum(a));
 }

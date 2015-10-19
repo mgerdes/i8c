@@ -219,22 +219,18 @@ expression
     ;
 
 function_call_args
-    :   
-        {
-            $$ = 0;
-        }
-    | expression ',' function_call_args
-        {
-            List* l = new_list();
-            l->head = $1;
-            l->rest = (List*) $3;
-            $$ = (Node*) l;
-        }
-    | expression
+    : expression  
         {
             List* l = new_list();
             l->head = $1;
             l->rest = 0;
+            $$ = (Node*) l;
+        }
+    | function_call_args ',' expression
+        {
+            List* l = new_list();
+            l->head = $3;
+            l->rest = (List*) $1;
             $$ = (Node*) l;
         }
     ;

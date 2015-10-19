@@ -3,6 +3,7 @@
 #include "i8c.h"
 #include "parser.tab.h"
 
+int num_of_call_registers = 6;
 char* call_registers[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"}; 
 FILE* output_file;
 
@@ -117,15 +118,17 @@ void gen_code_function_call(Function_Call* f) {
         exit(1);
     }
     List* arguments = f->arguments;  
-    int i = 0;
+    int num_of_args = 0;
     while(arguments) {
         gen_code(arguments->head);
-        if (i < 6) {
-            fprintf(output_file, "    mov    %%eax, %%%s\n", call_registers[i++]);
-        } else {
-            fprintf(output_file, "    push   %%rax\n");
-        }
+        fprintf(output_file, "    push   %rax\n");
         arguments = arguments->rest;
+        num_of_args++;
+    }
+    int j = 0;
+    while (j < num_of_args && j < num_of_call_registers) {
+        fprintf(output_file, "    pop    %%rax\n"); 
+        fprintf(output_file, "    mov    %%eax, %%%s\n", call_registers[j++]); 
     }
     fprintf(output_file, "    xor    %%eax, %%eax\n");
     fprintf(output_file, "    call   %s\n", s->name);
