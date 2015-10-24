@@ -1,9 +1,24 @@
 void printf();
 
+struct Thing {
+
+};
+
+int zero() {
+    return 0;
+}
+
 void expect(char *message, int b) {
+    char* red, green, reset;
+    red = "\x1b[31m";
+    green = "\x1b[32m";
+    reset = "\x1b[0m";
+
     if (!b) {
-        printf("%s failed\n", message);
-    }
+        printf("%s %sfailed%s\n", message, red, reset);
+        return;
+    } 
+    printf("%s %spassed%s\n", message, green, reset);
 }
 
 int fib(int n) {
@@ -39,4 +54,8 @@ int main() {
     expect("Sum test 1", sum(0) == 0);
     expect("Sum test 2", sum(1) == 1);
     expect("Sum test 3", sum(10) == 55);
+
+    expect("Function call test 1", zero() == 0);
+
+    return 0;
 }

@@ -9,7 +9,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING
+%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT
 
 %left '=' 
 %left '<' '>' LTE GTE EQ
@@ -33,6 +33,13 @@ program
             $$ = 0;
         }
     | function_definition program
+        {
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $2;
+            $$ = (Node*) l;
+        }
+    | struct_definition program
         {
             List* l = new_list();
             l->head = $1;
@@ -102,6 +109,10 @@ function_definition_args
         }
     ;
 
+struct_definition
+    : STRUCT IDENTIFIER '{' '}' ';'
+    ;
+
 block
     : 
         {
@@ -123,6 +134,12 @@ statement
             r->expression = $2;
             $$ = (Node*) r;
         }
+    | RETURN ';'
+         {
+            Return* r = new_return();
+            r->expression = 0;
+            $$ = (Node*) r;
+         }
     | while_loop
     | for_loop
     | if_statement 
@@ -271,7 +288,11 @@ unary_minus
     ;
 
 function_call_args
-    : expression  
+    : 
+        {
+            $$ = 0;
+        }
+    | expression  
         {
             List* l = new_list();
             l->head = $1;

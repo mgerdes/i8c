@@ -23,6 +23,7 @@ A {L}|{D}
 "while"     { return WHILE; }
 "for"       { return FOR; }
 "return"    { return RETURN; }
+"struct"    { return STRUCT; }
 
 "!"         { return '!'; }
 "+"         { return '+'; }
