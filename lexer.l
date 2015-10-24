@@ -23,6 +23,7 @@ A {L}|{D}
 "return"    { return RETURN; }
 
 "+"         { return '+'; }
+"&"         { return '&'; }
 "-"         { return '-'; }
 "*"         { return '*'; }
 "/"         { return '/'; }

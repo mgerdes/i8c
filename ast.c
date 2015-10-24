@@ -74,6 +74,18 @@ Return* new_return() {
     return r;
 }
 
+Reference* new_reference() {
+    Reference* r = malloc(sizeof(Reference));
+    r->kind = REFERENCE;
+    return r;
+}
+
+Dereference* new_dereference() {
+    Dereference* d = malloc(sizeof(Dereference));
+    d->kind = DEREFERENCE;
+    return d;
+}
+
 void print_binary_operator(int bin_op) {
     switch(bin_op){
         case '+':
@@ -110,6 +122,8 @@ void print_ast_indented(Node* ast, int tabs) {
         Function_Call* fc;
         Binary_Operator* b;
         Return* r;
+        Reference* re;
+        Dereference* de;
     } u;
 
     if (!ast) {
@@ -193,6 +207,15 @@ void print_ast_indented(Node* ast, int tabs) {
             u.r = (Return*) ast;
             printf("Return: \n");
             print_ast_indented(u.r->expression, tabs+1);
+            break;
+        case REFERENCE:
+            u.re = (Reference*) ast;
+            printf("Reference: %s\n", u.re->symbol->name);
+            break;
+        case DEREFERENCE:
+            u.de = (Dereference*) ast;
+            printf("Dereference:\n");
+            print_ast_indented(u.de->expression, tabs+1);
             break;
         default:
             printf("Unknown ast kind, fix them cases\n");

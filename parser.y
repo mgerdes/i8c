@@ -13,9 +13,10 @@ void yyerror(const char *str) {
 %token IDENTIFIER NUMBER STRING
 %token LTE GTE
 
-%left '='
+%left '=' 
 %left '<' '>' LTE GTE EQ
-%right '+' '-'
+%right '+' '-' 
+%right '*'
 
 %%
 
@@ -210,6 +211,8 @@ expression
         {
             $$ = $2;
         }
+    | reference
+    | dereference
     | NUMBER
     | STRING
     | IDENTIFIER
@@ -274,6 +277,22 @@ assignment
             $$ = (Node*) a;
         }
     ;
+
+reference
+    : '&' IDENTIFIER 
+        {
+            Reference* r = new_reference();
+            r->symbol = (Symbol*) $2;
+            $$ = (Node*) r;
+        }
+
+dereference
+    : '*' expression
+        {
+            Dereference* d = new_dereference();
+            d->expression = $2;
+            $$ = (Node*) d;
+        }
 
 type
     : INT

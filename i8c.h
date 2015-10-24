@@ -1,7 +1,7 @@
 enum {
     LIST, SYMBOL, FUNC_DEF, WHILE_LOOP, IF_ELSE,
     DECLARATION, ASSIGNMENT, CONSTANT, FUNC_CALL,
-    BINARY_OP, RETURN_STATEMENT
+    BINARY_OP, RETURN_STATEMENT, REFERENCE, DEREFERENCE
 };
 
 enum {
@@ -85,6 +85,16 @@ typedef struct Return {
     struct Node* expression;
 } Return;
 
+typedef struct Reference {
+    int kind;
+    struct Symbol* symbol;
+} Reference;
+
+typedef struct Dereference {
+    int kind;
+    struct Node* expression;
+} Dereference;
+
 Node* new_node();
 List* new_list();
 Symbol* new_symbol();
@@ -97,6 +107,8 @@ Constant* new_constant();
 Function_Call* new_function_call();
 Binary_Operator* new_binary_operator();
 Return* new_return();
+Reference* new_reference();
+Dereference* new_dereference();
 
 typedef struct Environment_Element {
     struct Symbol* symbol;
