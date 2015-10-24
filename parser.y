@@ -16,7 +16,8 @@ void yyerror(const char *str) {
 %left '=' 
 %left '<' '>' LTE GTE EQ
 %right '+' '-' 
-%right '*'
+%right '*' 
+%right '!' 
 
 %%
 
@@ -210,6 +211,12 @@ expression
     | '(' expression ')'
         {
             $$ = $2;
+        }
+    | '!' expression
+        {
+            Negation* n = new_negation();
+            n->expression = $2;
+            $$ = (Node*) n;
         }
     | reference
     | dereference

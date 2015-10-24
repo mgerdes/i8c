@@ -86,6 +86,12 @@ Dereference* new_dereference() {
     return d;
 }
 
+Negation* new_negation() {
+    Negation* n = malloc(sizeof(Negation));
+    n->kind = NEGATION;
+    return n;
+}
+
 void print_binary_operator(int bin_op) {
     switch(bin_op){
         case '+':
@@ -124,6 +130,7 @@ void print_ast_indented(Node* ast, int tabs) {
         Return* r;
         Reference* re;
         Dereference* de;
+        Negation* n;
     } u;
 
     if (!ast) {
@@ -216,6 +223,11 @@ void print_ast_indented(Node* ast, int tabs) {
             u.de = (Dereference*) ast;
             printf("Dereference:\n");
             print_ast_indented(u.de->expression, tabs+1);
+            break;
+        case NEGATION:
+            u.n = (Negation*) ast;
+            printf("Negation:\n");
+            print_ast_indented(u.n->expression, tabs+1);
             break;
         default:
             printf("Unknown ast kind, fix them cases\n");

@@ -1,5 +1,11 @@
 void printf();
 
+void expect(int b) {
+    if (!b) {
+        printf("A test failed :(\n");
+    }
+}
+
 void print_triangle(int n) {
     printf("%d\n", n);
     int a, i, j;
@@ -42,11 +48,19 @@ int sum(int n) {
 int main() {
     int a;
     int *b;
+
+    expect(10 + 10 == 20);
+    
+    b = 0;
+    printf("!b = %d\n", !b);
+    b = 1;
+    printf("!b = %d\n", !b);
+
     b = &a;
     a = 11;
     printf("b = %u\n", b);
     printf("a = %d\n", a);
     print_triangle(a);
-    printf("fib %d = %d\n", a, fib(a, 10));
+    printf("fib %d = %d\n", a, fib(a));
     printf("sum %d = %d\n", a, sum(a));
 }

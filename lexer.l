@@ -22,6 +22,7 @@ A {L}|{D}
 "float"     { return FLOAT; }
 "return"    { return RETURN; }
 
+"!"         { return '!'; }
 "+"         { return '+'; }
 "&"         { return '&'; }
 "-"         { return '-'; }

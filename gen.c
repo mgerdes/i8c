@@ -188,6 +188,13 @@ void gen_code_deference(Dereference* d) {
     gen_code(d->expression);  
 }
 
+void gen_code_negation(Negation* n) {
+    gen_code(n->expression);
+    fprintf(output_file, "    cmpl   $0, %%eax\n");
+    fprintf(output_file, "    sete   %%al\n");
+    fprintf(output_file, "    movzbl %%al, %%eax\n");
+}
+
 void gen_code(Node* ast) {
     union {
         List* l;
@@ -203,6 +210,7 @@ void gen_code(Node* ast) {
         Return* r;
         Reference* re;
         Dereference* de;
+        Negation* n;
     } u;
 
     if (!ast) {
@@ -262,6 +270,10 @@ void gen_code(Node* ast) {
         case DEREFERENCE:
             u.de = (Dereference*) ast;
             gen_code_deference(u.de);
+            break;
+        case NEGATION:
+            u.n = (Negation*) ast;
+            gen_code_negation(u.n);
             break;
         default:
             break;
