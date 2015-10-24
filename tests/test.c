@@ -29,6 +29,7 @@ int sum(int n) {
 int main() {
     expect("Addition test 1", 1 + 1 == 2);
     expect("Addition test 2", 0 + 1 == 1);
+    expect("Addition test 3", -1 + 1 == 0);
 
     expect("Subtration test 1", 1 - 1 == 0);
     expect("Subtration test 2", 2 - 1 == 1);

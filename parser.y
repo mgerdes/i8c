@@ -15,9 +15,10 @@ void yyerror(const char *str) {
 
 %left '=' 
 %left '<' '>' LTE GTE EQ
-%right '+' '-' 
-%right '*' 
+%right '+' '-'
+%right '*' '/'
 %right '!' 
+%precedence NEG   
 
 %%
 
@@ -218,6 +219,7 @@ expression
             n->expression = $2;
             $$ = (Node*) n;
         }
+    | unary_minus
     | reference
     | dereference
     | NUMBER
@@ -229,6 +231,22 @@ expression
             f->identifier = (Symbol*) $1; 
             f->arguments = (List*) $3;
             $$ = (Node*) f;
+        }
+    ;
+
+unary_minus
+    : '-' expression %prec NEG
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '-';
+
+            Constant* zero = new_constant();           
+            zero->constant_kind = INT_CONSTANT;
+            zero->int_value = 0;
+
+            b->left_expression = (Node*) zero;
+            b->right_expression = $2;
+            $$ = (Node*) b;
         }
     ;
 
