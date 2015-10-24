@@ -206,6 +206,10 @@ expression
             b->right_expression = $3;
             $$ = (Node*) b;
         }
+    | '(' expression ')'
+        {
+            $$ = $2;
+        }
     | NUMBER
     | STRING
     | IDENTIFIER
