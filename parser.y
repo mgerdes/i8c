@@ -9,16 +9,14 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE
-%token IDENTIFIER NUMBER STRING
-%token LTE GTE
+%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING
 
 %left '=' 
 %left '<' '>' LTE GTE EQ
 %right '+' '-'
 %right '*' '/'
 %right '!' 
-%precedence NEG   
+%precedence NEG
 
 %%
 
@@ -126,9 +124,9 @@ statement
             $$ = (Node*) r;
         }
     | while_loop
+    | for_loop
     | if_statement 
     | declaration ';'
-    | assignment ';'
     | expression ';' 
     ;
 
@@ -139,6 +137,27 @@ while_loop
             w->expression = $3;
             w->statements = $6;
             $$ = (Node*) w;
+        }
+    ;
+
+for_loop
+    : FOR '(' expression ';' expression ';' expression ')' '{' block '}'
+        {
+            List* l1 = new_list();
+            l1->head = $7;
+            l1->rest = 0;
+
+            ((List*) $10)->rest = l1;
+
+            While_Loop* w = new_while_loop();
+            w->expression = $5; 
+            w->statements = $10; 
+
+            List* l2 = new_list(); 
+            l2->head = $3;
+            l2->rest = (List*) w;
+
+            $$ = (Node*) l2;
         }
     ;
 
@@ -219,6 +238,7 @@ expression
             n->expression = $2;
             $$ = (Node*) n;
         }
+    | assignment
     | unary_minus
     | reference
     | dereference

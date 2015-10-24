@@ -21,6 +21,7 @@ A {L}|{D}
 "float"     { return FLOAT; }
 "void"      { return VOID; }
 "while"     { return WHILE; }
+"for"       { return FOR; }
 "return"    { return RETURN; }
 
 "!"         { return '!'; }

@@ -18,10 +18,8 @@ int fib(int n) {
 
 int sum(int n) {
     int sum;
-    sum = 0;
-    while (n > 0) {
-        sum = sum + n;   
-        n = n - 1;
+    for (sum = 0; n > 0; n = n - 1) {
+        sum = sum + n;
     }
     return sum;
 }
