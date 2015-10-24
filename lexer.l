@@ -17,9 +17,10 @@ A {L}|{D}
 "if"        { return IF; }
 "else"      { return ELSE; }
 "int"       { return INT; }
+"char"      { return CHAR; }
+"float"     { return FLOAT; }
 "void"      { return VOID; }
 "while"     { return WHILE; }
-"float"     { return FLOAT; }
 "return"    { return RETURN; }
 
 "!"         { return '!'; }

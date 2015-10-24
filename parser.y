@@ -9,7 +9,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT VOID RETURN WHILE IF ELSE
+%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE
 %token IDENTIFIER NUMBER STRING
 %token LTE GTE
 
@@ -305,6 +305,7 @@ type
     : INT
     | FLOAT
     | VOID
+    | CHAR
     | type '*'
     ;
 

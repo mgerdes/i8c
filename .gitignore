@@ -5,6 +5,7 @@
 *.s
 *.output
 i8c
+run_tests
 
 # Object files
 *.o
