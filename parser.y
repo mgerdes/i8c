@@ -298,6 +298,7 @@ type
     : INT
     | FLOAT
     | VOID
+    | type '*'
     ;
 
 %%
