@@ -1,7 +1,9 @@
 void printf();
 
 struct Thing {
-
+    int thing;
+    char* string;
+    int* pointer;
 };
 
 int zero() {

@@ -92,6 +92,12 @@ Negation* new_negation() {
     return n;
 }
 
+Struct* new_struct() {
+    Struct* s = malloc(sizeof(Struct));
+    s->kind = STRUCT_TYPE;
+    return s;
+}
+
 void print_binary_operator(int bin_op) {
     switch(bin_op){
         case '+':

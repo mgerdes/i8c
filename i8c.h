@@ -2,7 +2,7 @@ enum {
     LIST, SYMBOL, FUNC_DEF, WHILE_LOOP, IF_ELSE,
     DECLARATION, ASSIGNMENT, CONSTANT, FUNC_CALL,
     BINARY_OP, RETURN_STATEMENT, REFERENCE, DEREFERENCE,
-    NEGATION
+    NEGATION, STRUCT_TYPE
 };
 
 enum {
@@ -101,6 +101,12 @@ typedef struct Negation {
     struct Node* expression;
 } Negation;
 
+typedef struct Struct {
+    int kind;
+    struct Symbol* symbol;
+    struct List* declarations;
+} Struct;
+
 Node* new_node();
 List* new_list();
 Symbol* new_symbol();
@@ -116,6 +122,7 @@ Return* new_return();
 Reference* new_reference();
 Dereference* new_dereference();
 Negation* new_negation();
+Struct* new_struct();
 
 typedef struct Environment_Element {
     struct Symbol* symbol;

@@ -110,7 +110,27 @@ function_definition_args
     ;
 
 struct_definition
-    : STRUCT IDENTIFIER '{' '}' ';'
+    : STRUCT IDENTIFIER '{' list_of_declarations '}' ';'
+        {
+            Struct* s = new_struct();
+            s->symbol = (Symbol*) $2;
+            s->declarations = (List*) $4;
+            $$ = (Node*) s;
+        }
+    ;
+
+list_of_declarations
+    : 
+        {
+            $$ = 0;
+        }
+    | declaration ';' list_of_declarations
+        {
+            List* l = new_list();
+            l->head = $1;
+            l->rest = (List*) $3;
+            $$ = (Node*) l;
+        }
     ;
 
 block
