@@ -218,60 +218,60 @@ void gen_code(Node* ast) {
     }
 
     switch(ast->kind) {
-        case LIST:
+        case LIST_TYPE:
             u.l = (List*) ast;
             gen_code(u.l->head);
             gen_code((Node*) u.l->rest);
             break;
-        case SYMBOL:
+        case SYMBOL_TYPE:
             u.s = (Symbol*) ast;
             gen_code_symbol(u.s);
             break;
-        case FUNC_DEF:
+        case FUNC_DEF_TYPE:
             u.f = (Function_Definition*) ast;
             gen_code_function_def(u.f);
             break;
-        case WHILE_LOOP:
+        case WHILE_LOOP_TYPE:
             u.w = (While_Loop*) ast;
             gen_code_while_loop(u.w);
             break;
-        case IF_ELSE:
+        case IF_ELSE_TYPE:
             u.ie = (If_Else*) ast;
             gen_code_if_else(u.ie);
             break;
-        case DECLARATION:
+        case DECLARATION_TYPE:
             u.d = (Declaration*) ast;
             gen_code_declaration(u.d);
             break;
-        case ASSIGNMENT:
+        case ASSIGNMENT_TYPE:
             u.a = (Assignment*) ast;
             gen_code_assignment(u.a);
             break;
-        case CONSTANT:
+        case CONSTANT_TYPE:
             u.c = (Constant*) ast;
             gen_code_constant(u.c);
             break;
-        case FUNC_CALL:
+        case FUNC_CALL_TYPE:
             u.fc = (Function_Call*) ast;
             gen_code_function_call(u.fc);
             break;
-        case BINARY_OP:
+        case BINARY_OP_TYPE:
             u.b = (Binary_Operator*) ast;
             gen_code_bin_op(u.b);
             break;
-        case RETURN_STATEMENT:
+        case RETURN_STATEMENT_TYPE:
             u.r = (Return*) ast;
             gen_code_return(u.r);
             break;
-        case REFERENCE:
+        case REFERENCE_TYPE:
             u.re = (Reference*) ast;
             gen_code_reference(u.re);
             break;
-        case DEREFERENCE:
+        case DEREFERENCE_TYPE:
             u.de = (Dereference*) ast;
             gen_code_deference(u.de);
             break;
-        case NEGATION:
+        case NEGATION_TYPE:
             u.n = (Negation*) ast;
             gen_code_negation(u.n);
             break;

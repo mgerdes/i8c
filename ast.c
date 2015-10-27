@@ -10,85 +10,85 @@ Node* new_node() {
 
 List* new_list() {
     List* l = malloc(sizeof(List));
-    l->kind = LIST;
+    l->kind = LIST_TYPE;
     return l;
 }
 
 Symbol* new_symbol() {
     Symbol* s = malloc(sizeof(Symbol)); 
-    s->kind = SYMBOL;
+    s->kind = SYMBOL_TYPE;
     return s;
 }
 
 Function_Definition* new_function_definition() {
     Function_Definition* f = malloc(sizeof(Function_Definition)); 
-    f->kind = FUNC_DEF;
+    f->kind = FUNC_DEF_TYPE;
     return f;
 }
 
 While_Loop* new_while_loop() {
     While_Loop* w = malloc(sizeof(While_Loop));
-    w->kind = WHILE_LOOP;
+    w->kind = WHILE_LOOP_TYPE;
     return w;
 }
 
 If_Else* new_if_else() {
     If_Else* i = malloc(sizeof(If_Else));
-    i->kind = IF_ELSE;
+    i->kind = IF_ELSE_TYPE;
     return i;
 }
 
 Declaration* new_declaration() {
     Declaration* d = malloc(sizeof(Declaration));
-    d->kind = DECLARATION;
+    d->kind = DECLARATION_TYPE;
     return d;
 }
 
 Assignment* new_assignment() {
     Assignment* a = malloc(sizeof(Assignment));
-    a->kind = ASSIGNMENT;
+    a->kind = ASSIGNMENT_TYPE;
     return a;
 }
 
 Constant* new_constant() {
     Constant* c = malloc(sizeof(Constant));
-    c->kind = CONSTANT;
+    c->kind = CONSTANT_TYPE;
     return c;
 }
 
 Function_Call* new_function_call() {
     Function_Call* f = malloc(sizeof(Function_Call));
-    f->kind = FUNC_CALL;
+    f->kind = FUNC_CALL_TYPE;
     return f;
 }
 
 Binary_Operator* new_binary_operator() {
     Binary_Operator* b = malloc(sizeof(Binary_Operator));
-    b->kind = BINARY_OP;
+    b->kind = BINARY_OP_TYPE;
     return b;
 }
 
 Return* new_return() {
     Return* r = malloc(sizeof(Return));
-    r->kind = RETURN_STATEMENT;
+    r->kind = RETURN_STATEMENT_TYPE;
     return r;
 }
 
 Reference* new_reference() {
     Reference* r = malloc(sizeof(Reference));
-    r->kind = REFERENCE;
+    r->kind = REFERENCE_TYPE;
     return r;
 }
 
 Dereference* new_dereference() {
     Dereference* d = malloc(sizeof(Dereference));
-    d->kind = DEREFERENCE;
+    d->kind = DEREFERENCE_TYPE;
     return d;
 }
 
 Negation* new_negation() {
     Negation* n = malloc(sizeof(Negation));
-    n->kind = NEGATION;
+    n->kind = NEGATION_TYPE;
     return n;
 }
 
@@ -143,51 +143,51 @@ void print_ast_indented(Node* ast, int tabs) {
         return;
     }
 
-    if (ast->kind != LIST) {
+    if (ast->kind != LIST_TYPE) {
         for (i = 0; i < tabs; i++) {
             printf("  ");
         }
     }
 
     switch(ast->kind) {
-        case LIST:
+        case LIST_TYPE:
             u.l = (List*) ast;
             print_ast_indented(u.l->head, tabs);
             print_ast_indented((Node*) (u.l->rest), tabs);
             break;
-        case SYMBOL:
+        case SYMBOL_TYPE:
             u.s = (Symbol*) ast;
             printf("Symbol: %s\n", u.s->name);
             break;
-        case FUNC_DEF:
+        case FUNC_DEF_TYPE:
             u.f = (Function_Definition*) ast;
             printf("Function Defintion: %s\n", u.f->identifier->name);
             print_ast_indented(u.f->statements, tabs+1);
             break;
-        case WHILE_LOOP:
+        case WHILE_LOOP_TYPE:
             u.w = (While_Loop*) ast;
             printf("While Loop:\n");
             print_ast_indented(u.w->expression, tabs+1);
             print_ast_indented(u.w->statements, tabs+1);
             break;
-        case IF_ELSE:
+        case IF_ELSE_TYPE:
             u.ie = (If_Else*) ast;
             printf("If Statement:\n");
             print_ast_indented(u.ie->expression, tabs+1);
             print_ast_indented(u.ie->statements, tabs+1);
             break;
-        case DECLARATION:
+        case DECLARATION_TYPE:
             u.d = (Declaration*) ast;
             printf("Declaration:\n");
             print_ast_indented((Node*) u.d->identifiers, tabs+1);
             break;
-        case ASSIGNMENT:
+        case ASSIGNMENT_TYPE:
             u.a = (Assignment*) ast;
             printf("Assignment:\n");
             print_ast_indented(u.a->l_value, tabs+1);
             print_ast_indented(u.a->r_value, tabs+1);
             break;
-        case CONSTANT:
+        case CONSTANT_TYPE:
             u.c = (Constant*) ast;
             printf("Constant: ");
             if (u.c->constant_kind == INT_CONSTANT) {
@@ -199,7 +199,7 @@ void print_ast_indented(Node* ast, int tabs) {
             }
             printf("\n");
             break;
-        case FUNC_CALL:
+        case FUNC_CALL_TYPE:
             u.fc = (Function_Call*) ast;
             printf("Function Call: %s\n", u.fc->identifier->name);
             List* arguments = u.fc->arguments;
@@ -208,7 +208,7 @@ void print_ast_indented(Node* ast, int tabs) {
                 arguments = arguments->rest;
             }
             break;
-        case BINARY_OP:
+        case BINARY_OP_TYPE:
             u.b = (Binary_Operator*) ast;
             printf("Binary Op: ");
             print_binary_operator(u.b->op);
@@ -216,21 +216,21 @@ void print_ast_indented(Node* ast, int tabs) {
             print_ast_indented(u.b->left_expression, tabs+1);
             print_ast_indented(u.b->right_expression, tabs+1);
             break;
-        case RETURN_STATEMENT:
+        case RETURN_STATEMENT_TYPE:
             u.r = (Return*) ast;
             printf("Return: \n");
             print_ast_indented(u.r->expression, tabs+1);
             break;
-        case REFERENCE:
+        case REFERENCE_TYPE:
             u.re = (Reference*) ast;
             printf("Reference: %s\n", u.re->symbol->name);
             break;
-        case DEREFERENCE:
+        case DEREFERENCE_TYPE:
             u.de = (Dereference*) ast;
             printf("Dereference:\n");
             print_ast_indented(u.de->expression, tabs+1);
             break;
-        case NEGATION:
+        case NEGATION_TYPE:
             u.n = (Negation*) ast;
             printf("Negation:\n");
             print_ast_indented(u.n->expression, tabs+1);
