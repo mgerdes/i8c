@@ -112,9 +112,6 @@ function_definition_args
 struct_definition
     : STRUCT IDENTIFIER '{' list_of_declarations '}' ';'
         {
-            Struct* s = new_struct();
-            s->symbol = (Symbol*) $2;
-
             int size = 0;
             List* declarations = (List*) $4;
             while (declarations) {
@@ -126,8 +123,10 @@ struct_definition
                 declarations = declarations->rest;
             }
 
-            ((Symbol*) $2)->type = new_type(size);
-            ((Symbol*) $2)->type->is_struct = 1;
+            Struct* s = new_struct();
+            s->symbol = (Symbol*) $2;
+            s->symbol->type = new_type(size);
+            s->symbol->type->is_struct = 1;
             s->declarations = $4;
             $$ = (Node*) s;
         }
