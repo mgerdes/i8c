@@ -137,6 +137,7 @@ void print_ast_indented(Node* ast, int tabs) {
         Reference* re;
         Dereference* de;
         Negation* n;
+        Struct* st;
     } u;
 
     if (!ast) {
@@ -235,8 +236,14 @@ void print_ast_indented(Node* ast, int tabs) {
             printf("Negation:\n");
             print_ast_indented(u.n->expression, tabs+1);
             break;
+        case STRUCT_TYPE:
+            u.st = (Struct*) ast;
+            printf("Struct:\n");
+            print_ast_indented((Node*) u.st->symbol, tabs+1);
+            print_ast_indented(u.st->declarations, tabs+1);
+            break;
         default:
-            printf("Unknown ast kind, fix them cases\n");
+            printf("Unknown ast kind: %d\n", ast->kind);
     }
 }
 

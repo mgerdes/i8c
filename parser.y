@@ -114,7 +114,21 @@ struct_definition
         {
             Struct* s = new_struct();
             s->symbol = (Symbol*) $2;
-            s->declarations = (List*) $4;
+
+            int size = 0;
+            List* declarations = (List*) $4;
+            while (declarations) {
+                List* identifiers = ((Declaration*) declarations->head)->identifiers;
+                while (identifiers) {
+                    size += ((Symbol*) identifiers->head)->type->size;
+                    identifiers = identifiers->rest;
+                }
+                declarations = declarations->rest;
+            }
+
+            ((Symbol*) $2)->type = new_type(size);
+            ((Symbol*) $2)->type->is_struct = 1;
+            s->declarations = $4;
             $$ = (Node*) s;
         }
     ;
@@ -332,6 +346,13 @@ declaration
     : type list_of_identifiers 
         {
             Declaration* d = new_declaration();
+                
+            List* identifiers = (List*) $2;
+            while (identifiers) {
+                ((Symbol*) identifiers->head)->type = new_type(4);
+                identifiers = identifiers->rest;
+            }
+
             d->identifiers = (List*) $2;
             $$ = (Node*) d;
         }

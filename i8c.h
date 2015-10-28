@@ -28,7 +28,6 @@ typedef struct Symbol {
 
 typedef struct Function_Definition {
     int kind;
-    struct Type* return_type;
     struct Symbol* identifier;
     struct List* parameter_declarations;
     struct Node* statements;
@@ -48,7 +47,6 @@ typedef struct If_Else {
 
 typedef struct Declaration {
     int kind;
-    struct Type* type;
     struct List* identifiers;
 } Declaration;
 
@@ -104,7 +102,7 @@ typedef struct Negation {
 typedef struct Struct {
     int kind;
     struct Symbol* symbol;
-    struct List* declarations;
+    struct Node* declarations;
 } Struct;
 
 Node* new_node();
@@ -123,6 +121,13 @@ Reference* new_reference();
 Dereference* new_dereference();
 Negation* new_negation();
 Struct* new_struct();
+
+typedef struct Type {
+    int size; 
+    int is_struct;
+} Type;
+
+Type* new_type(int);
 
 typedef struct Environment_Element {
     struct Symbol* symbol;
