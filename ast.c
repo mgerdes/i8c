@@ -240,7 +240,7 @@ void print_ast_indented(Node* ast, int tabs) {
             u.st = (Struct*) ast;
             printf("Struct:\n");
             print_ast_indented((Node*) u.st->symbol, tabs+1);
-            print_ast_indented(u.st->declarations, tabs+1);
+            //print_ast_indented(u.st->declarations, tabs+1);
             break;
         default:
             printf("Unknown ast kind: %d\n", ast->kind);

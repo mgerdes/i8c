@@ -59,6 +59,8 @@ function_definition
     : type IDENTIFIER '(' function_definition_args ')' '{' block '}' 
         {
             Function_Definition* f = new_function_definition();
+            ((Symbol*) $2)->type = new_type(0);
+            ((Symbol*) $2)->type->is_func = 1;
             f->identifier = (Symbol*) $2;
             f->parameter_declarations = (List*) $4;
             f->statements = $7;
@@ -67,6 +69,8 @@ function_definition
     | type IDENTIFIER '(' function_definition_args ')' ';'
         {
             Function_Definition* f = new_function_definition();
+            ((Symbol*) $2)->type = new_type(0);
+            ((Symbol*) $2)->type->is_func = 1;
             f->identifier = (Symbol*) $2;
             f->parameter_declarations = (List*) $4;
             f->statements = 0;
@@ -82,6 +86,8 @@ function_definition_args
     | type IDENTIFIER
         {
             List* l1 = new_list();
+
+            ((Symbol*) $2)->type = (Type*) $1;
             l1->head = (Node*) $2;
 
             Declaration* d = new_declaration();
@@ -96,6 +102,8 @@ function_definition_args
     | type IDENTIFIER ',' function_definition_args
         {
             List* l1 = new_list();
+
+            ((Symbol*) $2)->type = (Type*) $1;
             l1->head = (Node*) $2;
 
             Declaration* d = new_declaration();
@@ -112,22 +120,22 @@ function_definition_args
 struct_definition
     : STRUCT IDENTIFIER '{' list_of_declarations '}' ';'
         {
-            int size = 0;
+            Struct* s = new_struct();
+            s->env = new_environment();
+
             List* declarations = (List*) $4;
             while (declarations) {
                 List* identifiers = ((Declaration*) declarations->head)->identifiers;
                 while (identifiers) {
-                    size += ((Symbol*) identifiers->head)->type->size;
+                    put_symbol(s->env, (Symbol*) identifiers->head);
                     identifiers = identifiers->rest;
                 }
                 declarations = declarations->rest;
             }
 
-            Struct* s = new_struct();
             s->symbol = (Symbol*) $2;
-            s->symbol->type = new_type(size);
+            s->symbol->type = new_type(s->env->total_offset);
             s->symbol->type->is_struct = 1;
-            s->declarations = $4;
             $$ = (Node*) s;
         }
     ;
@@ -384,7 +392,7 @@ declaration
                 
             List* identifiers = (List*) $2;
             while (identifiers) {
-                ((Symbol*) identifiers->head)->type = new_type(4);
+                ((Symbol*) identifiers->head)->type = (Type*) $1;
                 identifiers = identifiers->rest;
             }
 
@@ -438,10 +446,25 @@ dereference
 
 type
     : INT
+        {
+            $$ = (Node*) new_type(4);
+        }
     | FLOAT
+        {
+            $$ = (Node*) new_type(4);
+        }
     | VOID
+        {
+            $$ = (Node*) new_type(0);
+        }
     | CHAR
+        {
+            $$ = (Node*) new_type(4);
+        }
     | type '*'
+        {
+            $$ = (Node*) new_type(4);
+        }
     ;
 
 %%

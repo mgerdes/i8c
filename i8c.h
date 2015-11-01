@@ -2,7 +2,7 @@ enum {
     LIST_TYPE, SYMBOL_TYPE, FUNC_DEF_TYPE, WHILE_LOOP_TYPE, IF_ELSE_TYPE,
     DECLARATION_TYPE, ASSIGNMENT_TYPE, CONSTANT_TYPE, FUNC_CALL_TYPE,
     BINARY_OP_TYPE, RETURN_STATEMENT_TYPE, REFERENCE_TYPE, DEREFERENCE_TYPE,
-    NEGATION_TYPE, STRUCT_TYPE
+    NEGATION_TYPE, STRUCT_TYPE, TYPE_TYPE
 };
 
 enum {
@@ -64,6 +64,7 @@ typedef struct Constant {
         int int_value;
         char* string_value;
     };
+    struct Type* type;
 } Constant;
 
 typedef struct Function_Call {
@@ -102,7 +103,7 @@ typedef struct Negation {
 typedef struct Struct {
     int kind;
     struct Symbol* symbol;
-    struct Node* declarations;
+    struct Environment* env;
 } Struct;
 
 Node* new_node();
@@ -123,8 +124,10 @@ Negation* new_negation();
 Struct* new_struct();
 
 typedef struct Type {
+    int kind;
     int size; 
     int is_struct;
+    int is_func;
 } Type;
 
 Type* new_type(int);
@@ -142,6 +145,7 @@ typedef struct Environment {
 
 void put_symbol(Environment* env, Symbol* symbol); 
 Symbol* get_symbol(Environment* env, char* name); 
+Environment* new_environment();
 void push_new_environment();
 void pop_environment();
 Environment* top_environment();

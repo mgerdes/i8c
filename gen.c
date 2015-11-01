@@ -40,7 +40,7 @@ void gen_code_function_def(Function_Definition* f) {
             gen_code(declarations->head);
             // This is not good. Declarations should not be a list of identifiers.
             Symbol* s = get_symbol(top_environment(), ((Symbol*) (((Declaration*) declarations->head)->identifiers)->head)->name);
-            fprintf(output_file, "    movl   %d(%%ebp), %%eax\n", s->offset+4);
+            fprintf(output_file, "    movl   %d(%%ebp), %%eax\n", s->offset+s->type->size);
             fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", s->offset);
             declarations = declarations->rest; 
         }
@@ -76,10 +76,10 @@ void gen_code_declaration(Declaration* d) {
     List* l = d->identifiers;
     while (l) {
         put_symbol(top_environment(), (Symbol*) l->head);
-        size += 4;
+        size += ((Symbol*) l->head)->type->size;
         l = l->rest;
     }
-    fprintf(output_file, "    subl   $%d, %%esp\n", size+4);
+    fprintf(output_file, "    subl   $%d, %%esp\n", size);
 }
 
 void gen_code_assignment(Assignment* a) {
@@ -116,10 +116,16 @@ void gen_code_function_call(Function_Call* f) {
     int offset = 0;
     while(arguments) {
         gen_code(arguments->head);
+        if (arguments->head->kind == SYMBOL_TYPE) {
+            Symbol* s = get_symbol(top_environment(), ((Symbol*) arguments->head)->name);
+            offset += s->type->size;
+        } else {
+            // all constants have 4 bytes.
+            offset += 4;
+        }
         fprintf(output_file, "    pushl  %%eax\n");
         arguments = arguments->rest;
         num_of_args++;
-        offset += 4;
     }
     fprintf(output_file, "    call   %s\n", s->name);
     fprintf(output_file, "    addl   $%d, %%esp\n", offset);

@@ -37,7 +37,8 @@ Environment* top_environment() {
 void put_symbol(Environment* env, Symbol* symbol) {
     Environment_Element* element = new_element();    
     symbol->offset = env->total_offset;
-    env->total_offset += 4;
+
+    env->total_offset += symbol->type->size;
     element->symbol = symbol;
 
     Environment_Element* cur_element = env->first_element;
