@@ -14,7 +14,7 @@ void yyerror(const char *str) {
 %left '=' 
 %left '<' '>' LTE GTE EQ
 %right '+' '-'
-%right '*' '/'
+%right '*' '/' '%'
 %right '!' 
 %precedence NEG
 
@@ -234,6 +234,30 @@ expression
         {
             Binary_Operator* b = new_binary_operator();
             b->op = '-';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression '*' expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '*';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression '/' expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '/';
+            b->left_expression = $1;
+            b->right_expression = $3;
+            $$ = (Node*) b;
+        }
+    | expression '%' expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = '%';
             b->left_expression = $1;
             b->right_expression = $3;
             $$ = (Node*) b;

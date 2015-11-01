@@ -161,6 +161,26 @@ void gen_code_bin_op(Binary_Operator* b) {
             fprintf(output_file, "    subl   %%eax, %%ebx\n");
             fprintf(output_file, "    movl   %%ebx, %%eax\n");
             break;
+        case '*':
+            fprintf(output_file, "    imull  %%ebx, %%eax\n");
+            break;
+        case '/':
+            fprintf(output_file, "    pushl  %%eax\n");
+            fprintf(output_file, "    pushl  %%ebx\n");
+            fprintf(output_file, "    popl   %%eax\n");
+            fprintf(output_file, "    popl   %%ebx\n");
+            fprintf(output_file, "    cltd\n");
+            fprintf(output_file, "    idivl  %%ebx\n");
+            break;
+        case '%':
+            fprintf(output_file, "    pushl  %%eax\n");
+            fprintf(output_file, "    pushl  %%ebx\n");
+            fprintf(output_file, "    popl   %%eax\n");
+            fprintf(output_file, "    popl   %%ebx\n");
+            fprintf(output_file, "    cltd\n");
+            fprintf(output_file, "    idivl  %%ebx\n");
+            fprintf(output_file, "    movl   %%edx, %%eax\n");
+            break;
         case '<':
             generate_comparison('<', label);
             break;
