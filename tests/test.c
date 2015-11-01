@@ -4,17 +4,17 @@ int zero() {
     return 0;
 }
 
-void expect(char *message, int b) {
+void expect_equals(int v1, int v2, char* message) {
     char* red, green, reset;
     red = "\x1b[31m";
     green = "\x1b[32m";
     reset = "\x1b[0m";
 
-    if (!b) {
-        printf("%s %sfailed%s\n", message, red, reset);
+    if (v1 != v2) {
+        printf("%s%s failed, expected %d, but got %d%s\n", red, message, v1, v2, reset);
         return;
     } 
-    printf("%s %spassed%s\n", message, green, reset);
+    printf("%s%s passed%s\n", green, message, reset);
 }
 
 int fib(int n) {
@@ -44,43 +44,40 @@ int main() {
     struct test_stuct t;
     t.v1 = 10;
     t.v2 = 23;
-    expect("Struct member test 1", t.v1 == 10);
-    expect("Struct member test 2", t.v2 == 23);
+    expect_equals(t.v1, 10, "Struct member test 1");
+    expect_equals(t.v2, 23, "Struct member test 2");
 
-    expect("Addition test 1", 1 + 1 == 2);
-    expect("Addition test 2", 0 + 1 == 1);
-    expect("Addition test 3", -1 + 1 == 0);
+    expect_equals(1 + 1, 2, "Addition test 1");
+    expect_equals(0 + 1, 1, "Addition test 2");
+    expect_equals(-1 + 1, 0, "Addition test 3");
 
-    expect("Subtration test 1", 1 - 1 == 0);
-    expect("Subtration test 2", 2 - 1 == 1);
+    expect_equals(1 - 1, 0, "Subtraction test 1");
+    expect_equals(2 - 1, 1, "Subtraction test 2");
 
-    expect("Multiplication test 1", 1 * 1 == 1);
-    expect("Multiplication test 2", 1 * 0 == 0);
-    expect("Multiplication test 3", 3 * 5 == 15);
-    expect("Multiplication test 4", -5 * 5 == -25);
+    expect_equals(1 * 1, 1, "Multiplication test 1");
+    expect_equals(1 * 0, 0, "Multiplication test 2");
+    expect_equals(3 * 5, 15, "Multiplication test 3");
+    expect_equals(-5 * 5, -25, "Multiplication test 4");
 
-    expect("Division test 1", 1 / 1 == 1);
-    expect("Division test 2", 0 / 1 == 0);
-    expect("Division test 3", 25 / 5 == 5);
-    expect("Division test 4", 21 / 5 == 4);
+    expect_equals(1 / 1, 1, "Division test 1");
+    expect_equals(0 / 1, 0, "Divison test 2");
+    expect_equals(25 / 5, 5, "Divison test 3");
+    expect_equals(21 / 5, 4, "Divison test 4");
 
-    expect("Mod test 1", 2 % 1 == 0);
-    expect("Mod test 2", 2 % 2 == 0);
-    expect("Mod test 3", 3 % 2 == 1);
-    expect("Mod test 3", 21 % 5 == 1);
+    expect_equals(2 % 1, 0, "Mod test 1");
+    expect_equals(2 % 2, 0, "Mod test 2");
+    expect_equals(3 % 2, 1, "Mod test 3");
+    expect_equals(21 % 5, 1, "Mod test 4");
 
-    expect("Not equal test 1", 2 != 0);
-    expect("Not equal test 2", 2 != 1);
+    expect_equals(fib(0), 0, "Fibonnaci test 1");    
+    expect_equals(fib(1), 1, "Fibonnaci test 2");    
+    expect_equals(fib(10), 55, "Fibonnaci test 3");    
 
-    expect("Fibonnacci test 1", fib(0) == 0);    
-    expect("Fibonnacci test 2", fib(1) == 1);    
-    expect("Fibonnacci test 3", fib(10) == 55);    
+    expect_equals(sum(0), 0, "Sum test 1");
+    expect_equals(sum(1), 1, "Sum test 2");
+    expect_equals(sum(10), 55, "Sum test 3");
 
-    expect("Sum test 1", sum(0) == 0);
-    expect("Sum test 2", sum(1) == 1);
-    expect("Sum test 3", sum(10) == 55);
-
-    expect("Function call test 1", zero() == 0);
+    expect_equals(zero(), 0, "Function call test 1");
 
     return 0;
 }
