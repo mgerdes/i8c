@@ -64,6 +64,9 @@ int main() {
     expect("Mod test 3", 3 % 2 == 1);
     expect("Mod test 3", 21 % 5 == 1);
 
+    expect("Not equal test 1", 2 != 0);
+    expect("Not equal test 2", 2 != 1);
+
     expect("Fibonnacci test 1", fib(0) == 0);    
     expect("Fibonnacci test 2", fib(1) == 1);    
     expect("Fibonnacci test 3", fib(10) == 55);    

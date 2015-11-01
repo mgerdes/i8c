@@ -12,7 +12,7 @@ void yyerror(const char *str) {
 %token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT
 
 %left '=' 
-%left '<' '>' LTE GTE EQ
+%left '<' '>' LTE GTE EQ NEQ
 %right '+' '-'
 %right '*' '/' '%'
 %right '!' 
@@ -301,6 +301,18 @@ expression
             b->left_expression = $1;
             b->right_expression = $3;
             $$ = (Node*) b;
+        }
+    | expression NEQ expression
+        {
+            Binary_Operator* b = new_binary_operator();
+            b->op = EQ;
+            b->left_expression = $1;
+            b->right_expression = $3;
+
+            Negation* n = new_negation();
+            n->expression = (Node*) b;
+
+            $$ = (Node*) n;
         }
     | '(' expression ')'
         {

@@ -38,6 +38,7 @@ A {L}|{D}
 "<"         { return '<'; }
 "<="        { return LTE; }
 "=="        { return EQ; }
+"!="        { return NEQ; }
 
 ";"         { return ';'; }
 ","         { return ','; }
