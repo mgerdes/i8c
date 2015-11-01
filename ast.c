@@ -50,6 +50,12 @@ Assignment* new_assignment() {
     return a;
 }
 
+Member_Lookup* new_member_lookup() {
+    Member_Lookup* a = malloc(sizeof(Member_Lookup));
+    a->kind = MEMBER_LOOKUP_TYPE;
+    return a;
+}
+
 Constant* new_constant() {
     Constant* c = malloc(sizeof(Constant));
     c->kind = CONSTANT_TYPE;

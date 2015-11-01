@@ -2,7 +2,7 @@ enum {
     LIST_TYPE, SYMBOL_TYPE, FUNC_DEF_TYPE, WHILE_LOOP_TYPE, IF_ELSE_TYPE,
     DECLARATION_TYPE, ASSIGNMENT_TYPE, CONSTANT_TYPE, FUNC_CALL_TYPE,
     BINARY_OP_TYPE, RETURN_STATEMENT_TYPE, REFERENCE_TYPE, DEREFERENCE_TYPE,
-    NEGATION_TYPE, STRUCT_TYPE, TYPE_TYPE
+    NEGATION_TYPE, STRUCT_TYPE, TYPE_TYPE, MEMBER_LOOKUP_TYPE
 };
 
 enum {
@@ -56,6 +56,13 @@ typedef struct Assignment {
     struct Node* r_value;
 } Assignment;
 
+typedef struct Member_Lookup {
+    int kind;
+    struct Symbol* struct_symbol;
+    struct Symbol* member_symbol;
+    struct Node* r_value;
+} Member_Lookup;
+
 typedef struct Constant {
     int kind;
     int constant_kind;
@@ -103,7 +110,6 @@ typedef struct Negation {
 typedef struct Struct {
     int kind;
     struct Symbol* symbol;
-    struct Environment* env;
 } Struct;
 
 Node* new_node();
@@ -114,6 +120,7 @@ While_Loop* new_while_loop();
 If_Else* new_if_else();
 Declaration* new_declaration();
 Assignment* new_assignment();
+Member_Lookup* new_member_lookup();
 Constant* new_constant();
 Function_Call* new_function_call();
 Binary_Operator* new_binary_operator();
@@ -126,6 +133,7 @@ Struct* new_struct();
 typedef struct Type {
     int kind;
     int size; 
+    struct Environment* member_env;
     int is_struct;
     int is_func;
 } Type;

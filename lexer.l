@@ -42,6 +42,7 @@ A {L}|{D}
 
 ";"         { return ';'; }
 ","         { return ','; }
+"."         { return '.'; }
 "{"         { return '{'; }
 "}"         { return '}'; }
 "("         { return '('; }

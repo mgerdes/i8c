@@ -83,13 +83,36 @@ void gen_code_declaration(Declaration* d) {
 }
 
 void gen_code_assignment(Assignment* a) {
-    Symbol* s = get_symbol(top_environment(), ((Symbol*) a->l_value)->name);
-    if (!s) {
-        printf("Error: attempting to use undeclared symbol %s\n", ((Symbol*) a->l_value)->name);
-        exit(1);
+    if (a->l_value->kind == MEMBER_LOOKUP_TYPE) {
+        Member_Lookup* m = (Member_Lookup*) a->l_value;
+        Symbol* struct_symbol = get_symbol(top_environment(), m->struct_symbol->name);
+        Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
+        if (!member_symbol) {
+            printf("Could not find a member %s\n", m->member_symbol->name);
+        }
+        gen_code(a->r_value);
+        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", struct_symbol->offset + member_symbol->offset);
+    } else if (a->l_value->kind == SYMBOL_TYPE) {
+        Symbol* s = get_symbol(top_environment(), ((Symbol*) a->l_value)->name);
+        if (!s) {
+            printf("Error: attempting to use undeclared symbol %s\n", ((Symbol*) a->l_value)->name);
+            exit(1);
+        }
+        gen_code(a->r_value);
+        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", s->offset);
+    } else {
+        printf("Invalid lvalue\n");
     }
-    gen_code(a->r_value);
-    fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", s->offset);
+}
+
+void gen_code_member_assignment(Member_Lookup* m) {
+        Symbol* struct_symbol = get_symbol(top_environment(), m->struct_symbol->name);
+        Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
+
+        if (!member_symbol) {
+            printf("Could not find a member %s\n", m->member_symbol->name);
+        }
+        fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", struct_symbol->offset + member_symbol->offset);
 }
 
 void gen_code_constant(Constant* c) {
@@ -230,6 +253,7 @@ void gen_code(Node* ast) {
         If_Else* ie;
         Declaration* d;
         Assignment* a;
+        Member_Lookup* m;
         Constant* c;
         Function_Call* fc;
         Binary_Operator* b;
@@ -272,6 +296,10 @@ void gen_code(Node* ast) {
         case ASSIGNMENT_TYPE:
             u.a = (Assignment*) ast;
             gen_code_assignment(u.a);
+            break;
+        case MEMBER_LOOKUP_TYPE:
+            u.m = (Member_Lookup*) ast;
+            gen_code_member_assignment(u.m);
             break;
         case CONSTANT_TYPE:
             u.c = (Constant*) ast;

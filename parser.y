@@ -2,6 +2,7 @@
 #define YYSTYPE Node*
 #include "i8c.h"
 
+Environment* struct_env;
 int yyparse(void);
 int yylex();
 void yyerror(const char *str) {
@@ -120,22 +121,30 @@ function_definition_args
 struct_definition
     : STRUCT IDENTIFIER '{' list_of_declarations '}' ';'
         {
+            if (!struct_env) {
+                struct_env = new_environment();
+            }
+
             Struct* s = new_struct();
-            s->env = new_environment();
+
+            s->symbol = (Symbol*) $2;
+            s->symbol->type = new_type(0);
+            s->symbol->type->member_env = new_environment();
+            s->symbol->type->is_struct = 1;
 
             List* declarations = (List*) $4;
             while (declarations) {
                 List* identifiers = ((Declaration*) declarations->head)->identifiers;
                 while (identifiers) {
-                    put_symbol(s->env, (Symbol*) identifiers->head);
+                    put_symbol(s->symbol->type->member_env, (Symbol*) identifiers->head);
                     identifiers = identifiers->rest;
                 }
                 declarations = declarations->rest;
             }
 
-            s->symbol = (Symbol*) $2;
-            s->symbol->type = new_type(s->env->total_offset);
-            s->symbol->type->is_struct = 1;
+            s->symbol->type->size = s->symbol->type->member_env->total_offset;
+
+            put_symbol(struct_env, s->symbol);
             $$ = (Node*) s;
         }
     ;
@@ -332,6 +341,13 @@ expression
             n->expression = $2;
             $$ = (Node*) n;
         }
+    | IDENTIFIER '.' IDENTIFIER
+        {
+            Member_Lookup* m = new_member_lookup();
+            m->struct_symbol = (Symbol*) $1;
+            m->member_symbol = (Symbol*) $3;
+            $$ = (Node*) m;
+        }
     | assignment
     | unary_minus
     | reference
@@ -426,6 +442,17 @@ assignment
             a->r_value = $3;
             $$ = (Node*) a;
         }
+    | IDENTIFIER '.' IDENTIFIER '=' expression
+        {
+            Member_Lookup* m = new_member_lookup();
+            m->struct_symbol = (Symbol*) $1;
+            m->member_symbol = (Symbol*) $3;
+            
+            Assignment* a = new_assignment();
+            a->l_value = (Node*) m;
+            a->r_value = $5;
+            $$ = (Node*) a;
+        }
     ;
 
 reference
@@ -464,6 +491,14 @@ type
     | type '*'
         {
             $$ = (Node*) new_type(4);
+        }
+    | STRUCT IDENTIFIER
+        {
+            Symbol* s = get_symbol(struct_env, ((Symbol*) $2)->name);
+            if (!s) {
+                printf("Invalid struct name, %s\n", ((Symbol*) $2)->name);
+            } 
+            $$ = (Node*) s->type;            
         }
     ;
 

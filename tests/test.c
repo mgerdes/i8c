@@ -1,11 +1,5 @@
 void printf();
 
-struct Thing {
-    int thing;
-    char* string;
-    int* pointer;
-};
-
 int zero() {
     return 0;
 }
@@ -41,7 +35,18 @@ int sum(int n) {
     return sum;
 }
 
+struct test_stuct {
+    int v1;
+    int v2;
+};
+
 int main() {
+    struct test_stuct t;
+    t.v1 = 10;
+    t.v2 = 23;
+    expect("Struct member test 1", t.v1 == 10);
+    expect("Struct member test 2", t.v2 == 23);
+
     expect("Addition test 1", 1 + 1 == 2);
     expect("Addition test 2", 0 + 1 == 1);
     expect("Addition test 3", -1 + 1 == 0);
