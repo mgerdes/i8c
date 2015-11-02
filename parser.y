@@ -12,11 +12,11 @@ void yyerror(const char *str) {
 
 %token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT
 
-%left '=' 
+%left '=' '.'
 %left '<' '>' LTE GTE EQ NEQ
 %right '+' '-'
 %right '*' '/' '%'
-%right '!' 
+%right '!'
 %precedence NEG
 
 %%
@@ -341,13 +341,7 @@ expression
             n->expression = $2;
             $$ = (Node*) n;
         }
-    | IDENTIFIER '.' IDENTIFIER
-        {
-            Member_Lookup* m = new_member_lookup();
-            m->struct_symbol = (Symbol*) $1;
-            m->member_symbol = (Symbol*) $3;
-            $$ = (Node*) m;
-        }
+    | member_lookup
     | assignment
     | unary_minus
     | reference
@@ -363,6 +357,15 @@ expression
             $$ = (Node*) f;
         }
     ;
+
+member_lookup
+    : expression '.' IDENTIFIER
+        {
+            Member_Lookup* m = new_member_lookup();
+            m->struct_symbol = (Symbol*) $1;
+            m->member_symbol = (Symbol*) $3;
+            $$ = (Node*) m;
+        }
 
 unary_minus
     : '-' expression %prec NEG
@@ -442,15 +445,11 @@ assignment
             a->r_value = $3;
             $$ = (Node*) a;
         }
-    | IDENTIFIER '.' IDENTIFIER '=' expression
+    | member_lookup '=' expression
         {
-            Member_Lookup* m = new_member_lookup();
-            m->struct_symbol = (Symbol*) $1;
-            m->member_symbol = (Symbol*) $3;
-            
             Assignment* a = new_assignment();
-            a->l_value = (Node*) m;
-            a->r_value = $5;
+            a->l_value = $1;
+            a->r_value = $3;
             $$ = (Node*) a;
         }
     ;
