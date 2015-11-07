@@ -43,6 +43,8 @@ typedef struct If_Else {
     int kind;
     struct Node* expression;
     struct Node* statements;
+    struct List* else_if_statements;
+    struct Node* else_statement;
 } If_Else;
 
 typedef struct Declaration {

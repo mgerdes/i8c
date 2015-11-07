@@ -10,7 +10,7 @@ void yyerror(const char *str) {
 }
 %}
 
-%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT
+%token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT ELSE_IF
 
 %left '=' '.'
 %left '<' '>' LTE GTE EQ NEQ
@@ -229,12 +229,43 @@ for_loop
     ;
 
 if_statement
-    : IF '(' expression ')' '{' block '}'
+    : IF '(' expression ')' '{' block '}' else_if_statements else_statement
         {
             If_Else* i = new_if_else();
             i->expression = $3;
             i->statements = $6;
+            i->else_if_statements = (List*) $8;
+            i->else_statement = $9;
             $$ = (Node*) i;
+        }
+    ;
+
+else_if_statements
+    :
+        {
+            $$ = 0;
+        }
+    | ELSE_IF '(' expression ')' '{' block '}' else_if_statements
+        {
+            If_Else* i = new_if_else();
+            i->expression = $3;
+            i->statements = $6;
+
+            List* l = new_list();
+            l->head = (Node*) i;
+            l->rest = (List*) $8;
+            $$ = (Node*) l;
+        }
+    ;
+
+else_statement
+    :
+        {
+            $$ = 0;
+        }
+    | ELSE '{' block '}'
+        {
+            $$ = $3;
         }
     ;
 

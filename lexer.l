@@ -14,6 +14,7 @@ A {L}|{D}
 
 [ \t\n]+ { /* Ignore whitespace */ }
 
+"else if"   { return ELSE_IF; }
 "if"        { return IF; }
 "else"      { return ELSE; }
 "int"       { return INT; }

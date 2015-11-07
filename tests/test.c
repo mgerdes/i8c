@@ -101,9 +101,27 @@ void function_call_tests() {
     expect_equals(zero(), 0, "Function call test 1");
 }
 
+void if_else_tests() {
+    int x;
+    if (0) {
+        x = 10;
+    } else {
+        x = 11;
+    }
+    expect_equals(x, 11, "If test 1");
+
+    if (1) {
+        x = 10;
+    } else {
+        x = 11;
+    }
+    expect_equals(x, 10, "If test 2");
+}
+
 int main() {
     struct_tests();
     binary_operator_tests();
     function_call_tests();
+    if_else_tests();
     return 0;
 }

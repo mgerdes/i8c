@@ -186,6 +186,8 @@ void print_ast_indented(Node* ast, int tabs) {
             printf("If Statement:\n");
             print_ast_indented(u.ie->expression, tabs+1);
             print_ast_indented(u.ie->statements, tabs+1);
+            print_ast_indented((Node*) u.ie->else_if_statements, tabs);
+            print_ast_indented(u.ie->else_statement, tabs+1);
             break;
         case DECLARATION_TYPE:
             u.d = (Declaration*) ast;

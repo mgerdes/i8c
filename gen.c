@@ -64,10 +64,14 @@ void gen_code_while_loop(While_Loop* w) {
 
 void gen_code_if_else(If_Else* i) {
     int label = unique_label();
+    int else_label = unique_label();
     gen_code(i->expression);
     fprintf(output_file, "    cmpl   $0, %%eax\n");
-    fprintf(output_file, "    je     .L_END_IF_%d\n", label);
+    fprintf(output_file, "    je     .L_ELSE_%d\n", else_label);
     gen_code(i->statements);
+    fprintf(output_file, "    jmp    .L_END_IF_%d\n", label);
+    fprintf(output_file, ".L_ELSE_%d:\n", else_label);
+    gen_code(i->else_statement);
     fprintf(output_file, ".L_END_IF_%d:\n", label);
 }
 
