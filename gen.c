@@ -82,48 +82,7 @@ void gen_code_declaration(Declaration* d) {
     fprintf(output_file, "    subl   $%d, %%esp\n", size);
 }
 
-int member_lookup_address(Member_Lookup* m) {
-    char* pointer_name;
-    Symbol* dereference_symbol;
-    Symbol* struct_symbol;
-    Symbol* member_symbol;
-
-    switch (m->l_value->kind) {
-        case SYMBOL_TYPE:
-            struct_symbol = get_symbol(top_environment(), ((Symbol*) m->l_value)->name);
-            member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
-            return struct_symbol->offset + member_symbol->offset;
-            break;
-        case DEREFERENCE_TYPE:
-            pointer_name = ((Symbol*) ((Dereference*) m->l_value)->expression)->name;
-            dereference_symbol = get_symbol(top_environment(), pointer_name);
-            member_symbol = get_symbol(dereference_symbol->type->dereferenced_type->member_env, m->member_symbol->name);
-            break;
-    }
-    if (!member_symbol) {
-        printf("Could not find a member %s\n", m->member_symbol->name);
-    }
-}
-
-void gen_code_assignment(Assignment* a) {
-    if (a->l_value->kind == MEMBER_LOOKUP_TYPE) {
-        int address = member_lookup_address((Member_Lookup*) a->l_value);
-        gen_code(a->r_value);
-        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", address);
-    } else if (a->l_value->kind == SYMBOL_TYPE) {
-        Symbol* s = get_symbol(top_environment(), ((Symbol*) a->l_value)->name);
-        if (!s) {
-            printf("Error: attempting to use undeclared symbol %s\n", ((Symbol*) a->l_value)->name);
-            exit(1);
-        }
-        gen_code(a->r_value);
-        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", s->offset);
-    } else {
-        printf("Invalid lvalue\n");
-    }
-}
-
-void gen_code_member_lookup(Member_Lookup* m) {
+void gen_address_of_member_lookup(Member_Lookup* m) {
     if (m->l_value->kind == SYMBOL_TYPE) {
         char* struct_name = ((Symbol*) (m->l_value))->name;
         char* member_name = m->member_symbol->name;
@@ -131,9 +90,10 @@ void gen_code_member_lookup(Member_Lookup* m) {
         Symbol* struct_symbol = get_symbol(top_environment(), struct_name);
         Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, member_name); 
 
-        int address = struct_symbol->offset + member_symbol->offset;
+        int offset = struct_symbol->offset + member_symbol->offset;
 
-        fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", address);
+        fprintf(output_file, "    movl   %%ebp, %%eax\n");
+        fprintf(output_file, "    subl   $%d, %%eax\n", offset);
     } else if (m->l_value->kind == DEREFERENCE_TYPE) {
         Dereference* dereference = (Dereference*) (m->l_value);
         char* pointer_name = ((Symbol*) (dereference->expression))->name;
@@ -146,8 +106,38 @@ void gen_code_member_lookup(Member_Lookup* m) {
         gen_code(m->l_value);
         // lol super hack to just '+4'
         fprintf(output_file, "    subl   $%d, %%eax\n", member_symbol->offset+4);
-        fprintf(output_file, "    movl   (%%eax), %%eax\n");
     }
+}
+
+void gen_address_of_l_value(Node* l_value) {
+    if (l_value->kind == MEMBER_LOOKUP_TYPE) {
+        gen_address_of_member_lookup((Member_Lookup*) l_value);
+    } else if (l_value->kind == SYMBOL_TYPE) {
+        Symbol* s = get_symbol(top_environment(), ((Symbol*) l_value)->name);
+
+        if (!s) {
+            printf("Error: attempting to use undeclared symbol %s\n", ((Symbol*) l_value)->name);
+            exit(1);
+        }
+
+        fprintf(output_file, "    movl   %%ebp, %%eax\n");
+        fprintf(output_file, "    subl   $%d, %%eax\n", s->offset);
+    } else {
+        printf("Invalid lvalue\n");
+    }
+}
+
+void gen_code_assignment(Assignment* a) {
+    gen_address_of_l_value(a->l_value);
+    fprintf(output_file, "    pushl   %%eax\n");
+    gen_code(a->r_value);
+    fprintf(output_file, "    popl    %%ebx\n");
+    fprintf(output_file, "    movl    %%eax, (%%ebx)\n");
+}
+
+void gen_code_member_lookup(Member_Lookup* m) {
+    gen_address_of_member_lookup(m);
+    fprintf(output_file, "    movl   (%%eax), %%eax\n");
 }
 
 void gen_code_constant(Constant* c) {
