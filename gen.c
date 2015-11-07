@@ -129,10 +129,10 @@ void gen_address_of_l_value(Node* l_value) {
 
 void gen_code_assignment(Assignment* a) {
     gen_address_of_l_value(a->l_value);
-    fprintf(output_file, "    pushl   %%eax\n");
+    fprintf(output_file, "    pushl  %%eax\n");
     gen_code(a->r_value);
-    fprintf(output_file, "    popl    %%ebx\n");
-    fprintf(output_file, "    movl    %%eax, (%%ebx)\n");
+    fprintf(output_file, "    popl   %%ebx\n");
+    fprintf(output_file, "    movl   %%eax, (%%ebx)\n");
 }
 
 void gen_code_member_lookup(Member_Lookup* m) {
