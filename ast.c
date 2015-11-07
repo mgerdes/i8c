@@ -108,6 +108,9 @@ void print_binary_operator(int bin_op) {
     switch(bin_op){
         case '+':
         case '-':
+        case '*':
+        case '/':
+        case '%':
         case '>':
         case '<':
             printf("%c", bin_op);
@@ -122,7 +125,7 @@ void print_binary_operator(int bin_op) {
             printf("==");
             break;
         default : 
-            printf("Unknown operator");
+            printf("Unknown operator %c", bin_op);
     }
 }
 
