@@ -35,15 +35,20 @@ int sum(int n) {
     return sum;
 }
 
-struct test_stuct {
+struct test_struct {
     int v1;
     int v2;
 };
 
 int main() {
-    struct test_stuct t;
+    struct test_struct t;
+    struct test_struct* p;
     t.v1 = 10;
     t.v2 = 23;
+    p = &t;
+
+    (*p).v1;
+
     expect_equals(t.v1, 10, "Struct member test 1");
     expect_equals(t.v2, 23, "Struct member test 2");
 

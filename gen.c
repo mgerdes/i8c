@@ -82,16 +82,30 @@ void gen_code_declaration(Declaration* d) {
     fprintf(output_file, "    subl   $%d, %%esp\n", size);
 }
 
+int member_lookup_address(Member_Lookup* m) {
+    Symbol* struct_symbol;
+    Symbol* member_symbol;
+
+    switch (m->l_value->kind) {
+        case SYMBOL_TYPE:
+            struct_symbol = get_symbol(top_environment(), ((Symbol*) m->l_value)->name);
+            member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
+            break;
+        case DEREFERENCE_TYPE:
+            return 1;
+            break;
+    }
+    if (!member_symbol) {
+        printf("Could not find a member %s\n", m->member_symbol->name);
+    }
+    return struct_symbol->offset + member_symbol->offset;
+}
+
 void gen_code_assignment(Assignment* a) {
     if (a->l_value->kind == MEMBER_LOOKUP_TYPE) {
-        Member_Lookup* m = (Member_Lookup*) a->l_value;
-        Symbol* struct_symbol = get_symbol(top_environment(), m->struct_symbol->name);
-        Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
-        if (!member_symbol) {
-            printf("Could not find a member %s\n", m->member_symbol->name);
-        }
+        int address = member_lookup_address((Member_Lookup*) a->l_value);
         gen_code(a->r_value);
-        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", struct_symbol->offset + member_symbol->offset);
+        fprintf(output_file, "    movl   %%eax, -%d(%%ebp)\n", address);
     } else if (a->l_value->kind == SYMBOL_TYPE) {
         Symbol* s = get_symbol(top_environment(), ((Symbol*) a->l_value)->name);
         if (!s) {
@@ -105,14 +119,9 @@ void gen_code_assignment(Assignment* a) {
     }
 }
 
-void gen_code_member_assignment(Member_Lookup* m) {
-        Symbol* struct_symbol = get_symbol(top_environment(), m->struct_symbol->name);
-        Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
-
-        if (!member_symbol) {
-            printf("Could not find a member %s\n", m->member_symbol->name);
-        }
-        fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", struct_symbol->offset + member_symbol->offset);
+void gen_code_member_lookup(Member_Lookup* m) {
+    int address = member_lookup_address(m);
+    fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", address);
 }
 
 void gen_code_constant(Constant* c) {
@@ -299,7 +308,7 @@ void gen_code(Node* ast) {
             break;
         case MEMBER_LOOKUP_TYPE:
             u.m = (Member_Lookup*) ast;
-            gen_code_member_assignment(u.m);
+            gen_code_member_lookup(u.m);
             break;
         case CONSTANT_TYPE:
             u.c = (Constant*) ast;

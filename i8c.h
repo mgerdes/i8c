@@ -58,9 +58,8 @@ typedef struct Assignment {
 
 typedef struct Member_Lookup {
     int kind;
-    struct Symbol* struct_symbol;
+    struct Node* l_value;
     struct Symbol* member_symbol;
-    struct Node* r_value;
 } Member_Lookup;
 
 typedef struct Constant {
@@ -134,8 +133,12 @@ typedef struct Type {
     int kind;
     int size; 
     struct Environment* member_env;
+
     int is_struct;
     int is_func;
+
+    int is_pointer;
+    struct Type* dereferenced_type;
 } Type;
 
 Type* new_type(int);

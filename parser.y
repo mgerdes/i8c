@@ -362,7 +362,7 @@ member_lookup
     : expression '.' IDENTIFIER
         {
             Member_Lookup* m = new_member_lookup();
-            m->struct_symbol = (Symbol*) $1;
+            m->l_value = $1;
             m->member_symbol = (Symbol*) $3;
             $$ = (Node*) m;
         }
@@ -438,20 +438,19 @@ list_of_identifiers
     ;
 
 assignment
-    : IDENTIFIER '=' expression 
+    : l_value '=' expression 
         {
             Assignment* a = new_assignment();
             a->l_value = $1;
             a->r_value = $3;
             $$ = (Node*) a;
         }
-    | member_lookup '=' expression
-        {
-            Assignment* a = new_assignment();
-            a->l_value = $1;
-            a->r_value = $3;
-            $$ = (Node*) a;
-        }
+    ;
+
+l_value
+    : member_lookup
+    | IDENTIFIER
+    | 
     ;
 
 reference
@@ -489,7 +488,10 @@ type
         }
     | type '*'
         {
-            $$ = (Node*) new_type(4);
+            Type* t = new_type(4);
+            t->is_pointer = 1;
+            t->dereferenced_type = (Type*) $1;
+            $$ = (Node*) t;
         }
     | STRUCT IDENTIFIER
         {

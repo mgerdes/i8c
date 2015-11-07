@@ -7,5 +7,6 @@ Type* new_type(int size) {
     t->size = size;
     t->is_struct = 0;
     t->is_func = 0;
+    t->is_pointer = 0;
     return t;
 }

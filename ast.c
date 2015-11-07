@@ -144,6 +144,7 @@ void print_ast_indented(Node* ast, int tabs) {
         Dereference* de;
         Negation* n;
         Struct* st;
+        Member_Lookup* m;
     } u;
 
     if (!ast) {
@@ -246,7 +247,12 @@ void print_ast_indented(Node* ast, int tabs) {
             u.st = (Struct*) ast;
             printf("Struct:\n");
             print_ast_indented((Node*) u.st->symbol, tabs+1);
-            //print_ast_indented(u.st->declarations, tabs+1);
+            break;
+        case MEMBER_LOOKUP_TYPE:
+            u.m = (Member_Lookup*) ast;
+            printf("Member Lookup:\n");
+            print_ast_indented((Node*) u.m->l_value, tabs+1);
+            print_ast_indented((Node*) u.m->member_symbol, tabs+1);
             break;
         default:
             printf("Unknown ast kind: %d\n", ast->kind);
