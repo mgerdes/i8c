@@ -104,18 +104,47 @@ void function_call_tests() {
 void if_else_tests() {
     int x;
     if (0) {
-        x = 10;
+        x = 1;
     } else {
-        x = 11;
+        x = 2;
     }
-    expect_equals(x, 11, "If test 1");
+    expect_equals(x, 2, "If test 1");
 
     if (1) {
-        x = 10;
+        x = 3;
     } else {
-        x = 11;
+        x = 4;
     }
-    expect_equals(x, 10, "If test 2");
+    expect_equals(x, 3, "If test 2");
+
+    if (0) {
+        x = 5;
+    } else if (1) {
+        x = 6;
+    } 
+    expect_equals(x, 6, "If test 3");
+
+    if (0) {
+        x = 7;
+    } else if (0) {
+        x = 8;
+    } else if (0) {
+        x = 9;
+    } else if (1) {
+        x = 10;
+    }
+    expect_equals(x, 10, "If test 4");
+
+    if (0) {
+        x = 11;
+    } else if (0) {
+        x = 13;
+    } else if (0) {
+        x = 14;
+    } else {
+        x = 15;
+    }
+    expect_equals(x, 15, "If test 5");
 }
 
 int main() {
