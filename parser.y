@@ -119,7 +119,7 @@ function_definition_args
     ;
 
 struct_definition
-    : STRUCT IDENTIFIER '{' list_of_declarations '}' ';'
+    : STRUCT IDENTIFIER 
         {
             if (!struct_env) {
                 struct_env = new_environment();
@@ -131,8 +131,15 @@ struct_definition
             s->symbol->type = new_type(0);
             s->symbol->type->member_env = new_environment();
             s->symbol->type->is_struct = 1;
+            put_symbol(struct_env, s->symbol);
 
-            List* declarations = (List*) $4;
+            $$ = (Node*) s;
+        }
+            '{' list_of_declarations '}' ';'
+        {
+            Struct* s = (Struct*) $3;
+
+            List* declarations = (List*) $5;
             while (declarations) {
                 List* identifiers = ((Declaration*) declarations->head)->identifiers;
                 while (identifiers) {
@@ -143,8 +150,6 @@ struct_definition
             }
 
             s->symbol->type->size = s->symbol->type->member_env->total_offset;
-
-            put_symbol(struct_env, s->symbol);
             $$ = (Node*) s;
         }
     ;
