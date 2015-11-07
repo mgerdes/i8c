@@ -366,6 +366,16 @@ member_lookup
             m->member_symbol = (Symbol*) $3;
             $$ = (Node*) m;
         }
+    | expression '-' '>' IDENTIFIER
+        {
+            Dereference* d = new_dereference();
+            d->expression = $1;
+
+            Member_Lookup* m = new_member_lookup();
+            m->l_value = (Node*) d;
+            m->member_symbol = (Symbol*) $4;
+            $$ = (Node*) m;
+        }
 
 unary_minus
     : '-' expression %prec NEG

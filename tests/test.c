@@ -49,8 +49,8 @@ int main() {
 
     expect_equals(t.v1, 10, "Struct member test 1");
     expect_equals(t.v2, 23, "Struct member test 2");
-    expect_equals(*(p).v1, 10, "Struct member test 3");
-    expect_equals(*(p).v2, 23, "Struct member test 4");
+    expect_equals(p->v1, 10, "Struct member test 3");
+    expect_equals(p->v2, 23, "Struct member test 4");
 
     expect_equals(1 + 1, 2, "Addition test 1");
     expect_equals(0 + 1, 1, "Addition test 2");
