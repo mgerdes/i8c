@@ -83,6 +83,8 @@ void gen_code_declaration(Declaration* d) {
 }
 
 int member_lookup_address(Member_Lookup* m) {
+    char* pointer_name;
+    Symbol* dereference_symbol;
     Symbol* struct_symbol;
     Symbol* member_symbol;
 
@@ -90,15 +92,17 @@ int member_lookup_address(Member_Lookup* m) {
         case SYMBOL_TYPE:
             struct_symbol = get_symbol(top_environment(), ((Symbol*) m->l_value)->name);
             member_symbol = get_symbol(struct_symbol->type->member_env, m->member_symbol->name);
+            return struct_symbol->offset + member_symbol->offset;
             break;
         case DEREFERENCE_TYPE:
-            return 1;
+            pointer_name = ((Symbol*) ((Dereference*) m->l_value)->expression)->name;
+            dereference_symbol = get_symbol(top_environment(), pointer_name);
+            member_symbol = get_symbol(dereference_symbol->type->dereferenced_type->member_env, m->member_symbol->name);
             break;
     }
     if (!member_symbol) {
         printf("Could not find a member %s\n", m->member_symbol->name);
     }
-    return struct_symbol->offset + member_symbol->offset;
 }
 
 void gen_code_assignment(Assignment* a) {
@@ -120,8 +124,30 @@ void gen_code_assignment(Assignment* a) {
 }
 
 void gen_code_member_lookup(Member_Lookup* m) {
-    int address = member_lookup_address(m);
-    fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", address);
+    if (m->l_value->kind == SYMBOL_TYPE) {
+        char* struct_name = ((Symbol*) (m->l_value))->name;
+        char* member_name = m->member_symbol->name;
+
+        Symbol* struct_symbol = get_symbol(top_environment(), struct_name);
+        Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, member_name); 
+
+        int address = struct_symbol->offset + member_symbol->offset;
+
+        fprintf(output_file, "    movl   -%d(%%ebp), %%eax\n", address);
+    } else if (m->l_value->kind == DEREFERENCE_TYPE) {
+        Dereference* dereference = (Dereference*) (m->l_value);
+        char* pointer_name = ((Symbol*) (dereference->expression))->name;
+        char* member_name = m->member_symbol->name;
+
+        Symbol* pointer_symbol = get_symbol(top_environment(), pointer_name);
+        Environment* member_env = pointer_symbol->type->dereferenced_type->member_env;
+        Symbol* member_symbol = get_symbol(member_env, member_name);
+
+        gen_code(m->l_value);
+        // lol super hack to just '+4'
+        fprintf(output_file, "    subl   $%d, %%eax\n", member_symbol->offset+4);
+        fprintf(output_file, "    movl   (%%eax), %%eax\n");
+    }
 }
 
 void gen_code_constant(Constant* c) {

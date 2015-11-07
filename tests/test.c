@@ -4,14 +4,14 @@ int zero() {
     return 0;
 }
 
-void expect_equals(int v1, int v2, char* message) {
+void expect_equals(int actual_value, int expected_value, char* message) {
     char* red, green, reset;
     red = "\x1b[31m";
     green = "\x1b[32m";
     reset = "\x1b[0m";
 
-    if (v1 != v2) {
-        printf("%s%s failed, expected %d, but got %d%s\n", red, message, v1, v2, reset);
+    if (expected_value != actual_value) {
+        printf("%s%s failed: expected %d but got %d%s\n", red, message, expected_value, actual_value, reset);
         return;
     } 
     printf("%s%s passed%s\n", green, message, reset);
@@ -47,10 +47,10 @@ int main() {
     t.v2 = 23;
     p = &t;
 
-    (*p).v1;
-
     expect_equals(t.v1, 10, "Struct member test 1");
     expect_equals(t.v2, 23, "Struct member test 2");
+    expect_equals(*(p).v1, 10, "Struct member test 3");
+    expect_equals(*(p).v2, 23, "Struct member test 4");
 
     expect_equals(1 + 1, 2, "Addition test 1");
     expect_equals(0 + 1, 1, "Addition test 2");
