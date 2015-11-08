@@ -267,6 +267,14 @@ void gen_code_bin_op(Binary_Operator* b) {
         case EQ:
             generate_comparison(EQ, label);
             break;
+        case AND:
+            fprintf(output_file, "    andl   %%ebx, %%eax\n");
+            break;
+        case OR:
+            fprintf(output_file, "    orl    %%ebx, %%eax\n");
+            break;
+        default:
+            printf("Not generating code for a binary operator.\n");
     }
 }
 

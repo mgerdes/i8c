@@ -40,6 +40,8 @@ A {L}|{D}
 "<="        { return LTE; }
 "=="        { return EQ; }
 "!="        { return NEQ; }
+"&&"        { return AND; }
+"||"        { return OR; }
 
 ";"         { return ';'; }
 ","         { return ','; }

@@ -145,6 +145,21 @@ void if_else_tests() {
         x = 15;
     }
     expect_equals(x, 15, "If test 5");
+
+    int y;
+    if (1 && 0) {
+        y = 1;
+    } else if (1 && 1) {
+        y = 2;
+    }
+    expect_equals(y, 2, "If test 6");
+
+    if (0 || 0) {
+        y = 3;
+    } else if (1 || 0) {
+        y = 4;
+    }
+    expect_equals(y, 4, "If test 7");
 }
 
 int main() {
