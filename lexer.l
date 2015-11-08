@@ -52,6 +52,10 @@ A {L}|{D}
 "]"         { return ']'; }
 
 
+"//".*"\n" {
+
+           };
+
 \"(\\.|[^"])*\" {
                     Constant* c = new_constant();
                     c->constant_kind = STRING_CONSTANT;
