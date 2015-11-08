@@ -12,8 +12,9 @@ void yyerror(const char *str) {
 
 %token FLOAT INT CHAR VOID RETURN WHILE IF ELSE FOR IDENTIFIER NUMBER STRING STRUCT ELSE_IF
 
+%left AND OR
 %left '=' '.'
-%left '<' '>' LTE GTE EQ NEQ AND OR
+%left '<' '>' LTE GTE EQ NEQ 
 %right '+' '-'
 %right '*' '/' '%'
 %right '!'
