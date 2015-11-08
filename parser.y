@@ -130,6 +130,7 @@ struct_definition
             s->symbol = (Symbol*) $2;
             s->symbol->type = new_type(0);
             s->symbol->type->member_env = new_environment();
+            s->symbol->type->member_env->total_offset -= 4;
             s->symbol->type->is_struct = 1;
             put_symbol(struct_env, s->symbol);
 

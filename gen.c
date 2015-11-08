@@ -113,10 +113,11 @@ void gen_address_of_member_lookup(Member_Lookup* m) {
         Symbol* struct_symbol = get_symbol(top_environment(), struct_name);
         Symbol* member_symbol = get_symbol(struct_symbol->type->member_env, member_name); 
 
+        int struct_size = struct_symbol->type->member_env->total_offset;
         int offset = struct_symbol->offset + member_symbol->offset;
 
         fprintf(output_file, "    movl   %%ebp, %%eax\n");
-        fprintf(output_file, "    subl   $%d, %%eax\n", offset);
+        fprintf(output_file, "    subl   $%d, %%eax\n", struct_size-offset+4);
     } else if (m->l_value->kind == DEREFERENCE_TYPE) {
         Dereference* dereference = (Dereference*) (m->l_value);
         char* pointer_name = ((Symbol*) (dereference->expression))->name;
@@ -127,8 +128,7 @@ void gen_address_of_member_lookup(Member_Lookup* m) {
         Symbol* member_symbol = get_symbol(member_env, member_name);
 
         gen_code(m->l_value);
-        // lol super hack to just '+4'
-        fprintf(output_file, "    subl   $%d, %%eax\n", member_symbol->offset+4);
+        fprintf(output_file, "    addl   $%d, %%eax\n", member_symbol->offset+4);
     }
 }
 
@@ -278,7 +278,7 @@ void gen_code_return(Return* r) {
 
 void gen_code_reference(Reference* r) {
     fprintf(output_file, "    movl   %%ebp, %%eax\n");
-    fprintf(output_file, "    subl   $%d, %%eax\n", r->symbol->offset);
+    fprintf(output_file, "    addl   $%d, %%eax\n", r->symbol->offset-12);
 }
 
 void gen_code_deference(Dereference* d) {
