@@ -162,10 +162,17 @@ void if_else_tests() {
     expect_equals(y, 4, "If test 7");
 }
 
+void character_tests() {
+    expect_equals(97, 'a', "Character test 3");
+    expect_equals(32, ' ', "Character test 2");
+    expect_equals(9, '9' - '0', "Character test 3");
+}
+
 int main() {
     struct_tests();
     binary_operator_tests();
     function_call_tests();
     if_else_tests();
+    character_tests();
     return 0;
 }

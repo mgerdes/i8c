@@ -53,7 +53,6 @@ A {L}|{D}
 "["         { return '['; }
 "]"         { return ']'; }
 
-
 "//".*"\n" {
 
            };
@@ -90,5 +89,14 @@ A {L}|{D}
 
                 return NUMBER; 
             };
+
+'.' {
+    Constant* n = new_constant();
+    n->constant_kind = INT_CONSTANT;
+    n->int_value = yytext[1];
+    yylval = (Node*) n;
+
+    return NUMBER;
+}
 
 %%
